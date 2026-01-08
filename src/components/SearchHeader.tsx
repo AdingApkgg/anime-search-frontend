@@ -70,7 +70,7 @@ export function SearchHeader() {
       <motion.h1
         className={cn(
           "font-extrabold text-[var(--text-primary)] tracking-tight transition-all duration-300",
-          hasResults ? "text-xl sm:text-2xl mb-3 sm:mb-4" : "text-2xl sm:text-3xl mb-4 sm:mb-6"
+          hasResults ? "text-2xl sm:text-3xl mb-3 sm:mb-4" : "text-3xl sm:text-4xl mb-4 sm:mb-6"
         )}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
