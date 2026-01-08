@@ -118,7 +118,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     })
 
     // 并行获取 Bangumi 信息
-    void fetchBangumiInfoList(query, 3).then((list) => {
+    void fetchBangumiInfoList(query, 12).then((list) => {
       set({ bangumiList: list })
     })
 

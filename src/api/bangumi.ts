@@ -195,9 +195,9 @@ function toBangumiInfo(data: FlatBangumiInfo | BangumiSubject): BangumiInfo {
 /**
  * 搜索并获取多个结果的信息
  * 后端 /bangumi/search 已返回扁平化的完整数据
- * @param limit 返回结果数量，默认 3
+ * @param limit 返回结果数量，默认 12
  */
-export async function fetchBangumiInfoList(keyword: string, limit = 3): Promise<BangumiInfo[]> {
+export async function fetchBangumiInfoList(keyword: string, limit = 12): Promise<BangumiInfo[]> {
   try {
     const response = await fetch(`${BANGUMI_API_BASE}/search/${encodeURIComponent(keyword)}`)
     if (!response.ok) return []
