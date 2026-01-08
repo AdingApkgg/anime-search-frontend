@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Loader2, ChevronDown, ChevronUp, Check, X, ListVideo, Settings2 } from 'lucide-react'
+import { Search, Loader2, ChevronDown, ChevronUp, Check, X, Settings2 } from 'lucide-react'
 import { cn, COLORS } from '@/lib/utils'
 import { playTap, playButton, playToggle } from '@/lib/sound'
 import { useSearchStore } from '@/store/search'
+import { StatsCorner } from './StatsCorner'
 
 export function SearchHeader() {
   const {
@@ -15,18 +16,12 @@ export function SearchHeader() {
     selectedRules,
     rulesLoading,
     rulesError,
-    getEpisodes,
-    setGetEpisodes,
     toggleRule,
     selectAllRules,
     clearAllRules,
     loadRules,
-    search,
-    platforms
+    search
   } = useSearchStore()
-  
-  // 有结果时减少 header 高度
-  const hasResults = platforms.length > 0
 
   const [showRules, setShowRules] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -49,11 +44,6 @@ export function SearchHeader() {
     inputRef.current?.focus()
   }
 
-  const handleToggleEpisodes = () => {
-    playToggle()
-    setGetEpisodes(!getEpisodes)
-  }
-
   const handleToggleRules = () => {
     playToggle()
     setShowRules(!showRules)
@@ -61,17 +51,11 @@ export function SearchHeader() {
 
   return (
     <header 
-      className={cn(
-        "flex flex-col items-center justify-end px-2 sm:px-4 transition-all duration-500",
-        hasResults ? "pt-16 sm:pt-4 pb-4 sm:pb-6" : "min-h-[45vh] sm:min-h-[50vh]"
-      )}
+      className="flex flex-col items-center justify-end px-2 sm:px-4 pt-16 sm:pt-4 pb-4 sm:pb-6 min-h-[45vh] sm:min-h-[50vh]"
     >
       {/* Brand */}
       <motion.h1
-        className={cn(
-          "font-extrabold text-[var(--text-primary)] tracking-tight transition-all duration-300",
-          hasResults ? "text-2xl sm:text-3xl mb-3 sm:mb-4" : "text-3xl sm:text-4xl mb-4 sm:mb-6"
-        )}
+        className="font-extrabold text-[var(--text-primary)] tracking-tight text-3xl sm:text-4xl mb-4 sm:mb-6"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -81,10 +65,7 @@ export function SearchHeader() {
 
       {/* Search Box */}
       <motion.div
-        className={cn(
-          "w-full transition-all duration-300",
-          hasResults ? "max-w-xl" : "max-w-lg"
-        )}
+        className="w-full max-w-lg"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
@@ -96,8 +77,7 @@ export function SearchHeader() {
               'bg-white/80 dark:bg-slate-800/80 border-slate-200 dark:border-slate-600/50 shadow-lg',
               'hover:border-slate-300 dark:hover:border-slate-500/50',
               'focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/30',
-              isSearching && 'border-orange-500 ring-2 ring-orange-500/30',
-              hasResults && 'shadow-md'
+              isSearching && 'border-orange-500 ring-2 ring-orange-500/30'
             )}
           >
             <div
@@ -149,30 +129,23 @@ export function SearchHeader() {
         </form>
       </motion.div>
 
+      {/* Stats */}
+      <motion.div
+        className="mt-3 sm:mt-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.15 }}
+      >
+        <StatsCorner />
+      </motion.div>
+
       {/* Options */}
       <motion.div
-        className={cn(
-          "flex flex-wrap items-center justify-center gap-2",
-          hasResults ? "mt-2 sm:mt-3" : "mt-3 sm:mt-4"
-        )}
+        className="flex flex-wrap items-center justify-center gap-2 mt-2 sm:mt-3"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.2 }}
       >
-        <button
-          type="button"
-          className={cn(
-            'flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all border',
-            'bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-500 text-slate-700 dark:text-slate-200 shadow-sm sm:shadow-md',
-            'hover:bg-slate-200 dark:hover:bg-slate-600 hover:border-slate-400',
-            getEpisodes && 'bg-orange-100 dark:bg-orange-900 border-orange-400 dark:border-orange-500 text-orange-600 dark:text-orange-300'
-          )}
-          onClick={handleToggleEpisodes}
-        >
-          <ListVideo size={14} />
-          <span className="hidden xs:inline">获取</span>集数
-        </button>
-
         <button
           type="button"
           className={cn(

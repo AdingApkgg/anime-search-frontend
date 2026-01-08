@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUp, Navigation, ChevronUp, ChevronDown, X, MessageCircle } from 'lucide-react'
+import { ArrowUp, Navigation, X, MessageCircle, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { playTap, playTransitionUp } from '@/lib/sound'
 import { useSearchStore } from '@/store/search'
@@ -8,7 +8,7 @@ import { useUIStore } from '@/store/ui'
 
 export function FloatingButtons() {
   const { platforms } = useSearchStore()
-  const { showNavPanel, toggleNavPanel, closeNavPanel, openComments } = useUIStore()
+  const { showNavPanel, toggleNavPanel, closeNavPanel, openComments, openSettings } = useUIStore()
   const [showBackToTop, setShowBackToTop] = useState(false)
 
   useEffect(() => {
@@ -19,13 +19,9 @@ export function FloatingButtons() {
     return () => { window.removeEventListener('scroll', handleScroll) }
   }, [])
 
-  const findPlatformElement = useCallback((name: string): Element | null => {
-    return document.querySelector(`[data-platform="${name}"]`)
-  }, [])
-
   const scrollToPlatform = useCallback(
     (name: string) => {
-      const element = findPlatformElement(name)
+      const element = document.querySelector(`[data-platform="${name}"]`)
       if (element) {
         const offset = 80
         const top = element.getBoundingClientRect().top + window.scrollY - offset
@@ -33,43 +29,8 @@ export function FloatingButtons() {
       }
       closeNavPanel()
     },
-    [findPlatformElement, closeNavPanel]
+    [closeNavPanel]
   )
-
-  const getCurrentPlatformIndex = useCallback((): number => {
-    const scrollY = window.scrollY + 200
-    let currentIndex = -1
-
-    platforms.forEach((platform, index) => {
-      const element = findPlatformElement(platform.name)
-      if (element) {
-        const top = element.getBoundingClientRect().top + window.scrollY
-        if (scrollY >= top) {
-          currentIndex = index
-        }
-      }
-    })
-
-    return currentIndex
-  }, [platforms, findPlatformElement])
-
-  const scrollPrevPlatform = () => {
-    playTap()
-    const currentIndex = getCurrentPlatformIndex()
-    if (currentIndex > 0) {
-      scrollToPlatform(platforms[currentIndex - 1].name)
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }
-
-  const scrollNextPlatform = () => {
-    playTap()
-    const currentIndex = getCurrentPlatformIndex()
-    if (currentIndex < platforms.length - 1) {
-      scrollToPlatform(platforms[currentIndex + 1].name)
-    }
-  }
 
   const scrollToTop = () => {
     playTap()
@@ -84,6 +45,11 @@ export function FloatingButtons() {
   const handleToggleNav = () => {
     playTap()
     toggleNavPanel()
+  }
+
+  const handleOpenSettings = () => {
+    playTransitionUp()
+    openSettings()
   }
 
   return (
@@ -132,36 +98,31 @@ export function FloatingButtons() {
         )}
       </AnimatePresence>
 
-      {/* Button Group */}
+      {/* Button Group - 从上到下: 置顶、导航、评论、设置 */}
       <div className="flex flex-col gap-2">
+        <FAB
+          title="返回顶部"
+          onClick={scrollToTop}
+          className={cn(
+            !showBackToTop && 'opacity-0 invisible scale-50 pointer-events-none'
+          )}
+          primary
+        >
+          <ArrowUp size={20} />
+        </FAB>
+
         {platforms.length > 0 && (
-          <>
-            <FAB title="上一个站点" onClick={scrollPrevPlatform}>
-              <ChevronUp size={20} />
-            </FAB>
-            <FAB title="站点导航" onClick={handleToggleNav}>
-              <Navigation size={20} />
-            </FAB>
-            <FAB title="下一个站点" onClick={scrollNextPlatform}>
-              <ChevronDown size={20} />
-            </FAB>
-          </>
+          <FAB title="站点导航" onClick={handleToggleNav}>
+            <Navigation size={20} />
+          </FAB>
         )}
 
         <FAB title="评论" onClick={handleOpenComments}>
           <MessageCircle size={20} />
         </FAB>
 
-        <FAB
-          title="返回顶部"
-          onClick={scrollToTop}
-          className={cn(
-            'bg-gradient-to-br from-orange-500 to-orange-600 text-white border-orange-500/50 shadow-orange-500/40',
-            !showBackToTop && 'opacity-0 invisible scale-50'
-          )}
-          primary
-        >
-          <ArrowUp size={20} />
+        <FAB title="设置" onClick={handleOpenSettings}>
+          <Settings size={20} />
         </FAB>
       </div>
     </div>

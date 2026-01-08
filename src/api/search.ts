@@ -1,3 +1,6 @@
+// API 配置 - 动态获取
+import { getApiBaseUrl } from '@/store/ui'
+
 // 类型定义
 export interface Episode {
   name: string
@@ -33,9 +36,6 @@ export interface SearchCallbacks {
   onError?: (error: string) => void
 }
 
-// API 配置
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'https://anime-search.saop.cc'
-
 // 规则信息
 export interface Rule {
   name: string
@@ -70,7 +70,7 @@ interface ApiInfo {
  * 获取规则列表
  */
 export async function fetchRules(): Promise<Rule[]> {
-  const response = await fetch(`${API_BASE_URL}/rules`)
+  const response = await fetch(`${getApiBaseUrl()}/rules`)
 
   if (!response.ok) {
     throw new Error(`HTTP ${response.status.toString()}`)
@@ -103,7 +103,7 @@ export async function searchAnime(
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api`, {
+    const response = await fetch(`${getApiBaseUrl()}/api`, {
       method: 'POST',
       body: formData,
       signal
@@ -213,7 +213,7 @@ export async function searchAnime(
  * 获取 API 信息
  */
 export async function fetchApiInfo(): Promise<ApiInfo> {
-  const response = await fetch(`${API_BASE_URL}/info`)
+  const response = await fetch(`${getApiBaseUrl()}/info`)
 
   if (!response.ok) {
     throw new Error(`HTTP ${response.status.toString()}`)

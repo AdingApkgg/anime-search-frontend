@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ExternalLink, Star, Users, Play, Heart, Eye, Bookmark } from 'lucide-react'
+import { ExternalLink, Star, Hash, Calendar, Play, Heart, Eye, Bookmark } from 'lucide-react'
 import { formatNumber } from '@/lib/utils'
 import { useSearchStore } from '@/store/search'
 import type { BangumiInfo } from '@/api/bangumi'
@@ -10,10 +10,20 @@ export function BangumiCard() {
   if (bangumiList.length === 0) return null
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-2 sm:px-4 mb-3 sm:mb-4 overflow-hidden">
-      <div className="flex gap-2 sm:gap-3 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-thin scrollbar-track-white/5 scrollbar-thumb-orange-500/30">
+    <div className="w-full mb-4 sm:mb-6">
+      {/* 标题 */}
+      <div className="flex items-center gap-2 px-3 sm:px-4 mb-3">
+        <div className="w-1 h-4 rounded-full bg-gradient-to-b from-orange-400 to-orange-600" />
+        <span className="text-sm font-semibold text-white/80">Bangumi 匹配</span>
+        <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-orange-500/20 text-orange-400">
+          {bangumiList.length}
+        </span>
+      </div>
+
+      {/* 卡片滚动容器 */}
+      <div className="flex gap-3 px-3 sm:px-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-orange-500/30 hover:scrollbar-thumb-orange-500/50">
         {bangumiList.map((info, index) => (
-          <BangumiCardItem key={info.id || index} info={info} index={index} />
+          <BangumiCardItem key={info.id ?? index} info={info} index={index} />
         ))}
       </div>
     </div>
@@ -27,117 +37,125 @@ function BangumiCardItem({ info, index }: { info: BangumiInfo; index: number }) 
     image,
     score,
     rank,
-    total,
     air_date,
     summary,
     url,
     eps,
-    tags,
     collection
   } = info
 
+  const displayName = name_cn ?? name
+
   return (
-    <motion.div
-      className="flex gap-3.5 p-3.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-orange-500/10 shadow-lg snap-start flex-shrink-0 min-w-[280px] max-w-[360px] md:min-w-[320px] md:max-w-[400px]"
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.1 }}
+    <motion.a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative flex-shrink-0 w-[200px] sm:w-[220px] rounded-2xl overflow-hidden snap-start cursor-pointer"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4, delay: index * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+      whileHover={{ y: -4 }}
     >
-      {/* Cover */}
-      {image && (
+      {/* 封面背景 */}
+      <div className="relative aspect-[3/4] overflow-hidden">
+        {image ? (
         <img
           src={image}
-          alt={name_cn ?? name}
-          className="flex-shrink-0 w-[90px] h-[128px] rounded-lg object-cover bg-slate-100 dark:bg-slate-900/50 shadow-lg"
+            alt={displayName}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            loading="lazy"
           onError={(e) => {
-            ;(e.target as HTMLImageElement).style.display = 'none'
-          }}
-        />
-      )}
+              (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%231e293b" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%2364748b" font-size="12">No Image</text></svg>'
+            }}
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+            <Play size={32} className="text-slate-600" />
+          </div>
+        )}
 
-      {/* Info */}
-      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-        <div className="text-lg font-bold text-slate-900 dark:text-white truncate">{name_cn ?? name}</div>
-        {name_cn && <div className="text-xs text-slate-500 dark:text-white/50 truncate">{name}</div>}
+        {/* 渐变遮罩 */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
-        {/* Meta */}
-        <div className="flex flex-wrap items-center gap-2.5 mt-1 text-xs">
+        {/* 评分徽章 */}
           {score && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-yellow-400/15 text-yellow-400 font-semibold">
-              <Star size={11} />
-              {score.toFixed(1)}
-            </span>
+          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10">
+            <Star size={12} className="text-yellow-400 fill-yellow-400" />
+            <span className="text-xs font-bold text-white">{score.toFixed(1)}</span>
+          </div>
           )}
+
+        {/* 排名徽章 */}
           {rank && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-orange-500/15 text-orange-400 font-semibold">
-              #{rank}
+          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-orange-500/80 backdrop-blur-sm">
+            <Hash size={10} className="text-white" />
+            <span className="text-xs font-bold text-white">{rank}</span>
+          </div>
+        )}
+
+        {/* 外部链接指示 */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <ExternalLink size={20} className="text-white" />
+        </div>
+
+        {/* 底部信息区 */}
+        <div className="absolute bottom-0 left-0 right-0 p-3">
+          {/* 标题 */}
+          <h3 className="text-sm font-bold text-white line-clamp-2 mb-1.5 group-hover:text-orange-300 transition-colors">
+            {displayName}
+          </h3>
+
+          {/* 元信息行 */}
+          <div className="flex items-center gap-2 text-[11px] text-white/70">
+            {air_date && (
+              <span className="flex items-center gap-1">
+                <Calendar size={10} />
+                {air_date.slice(0, 4)}
             </span>
           )}
           {eps && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-500/15 text-blue-400 font-semibold">
+              <span className="flex items-center gap-1">
               <Play size={10} />
-              {eps} 话
-            </span>
-          )}
-          {air_date && <span className="text-slate-500 dark:text-white/50">{air_date}</span>}
-          {total && (
-            <span className="text-slate-400 dark:text-white/40 text-[11px]">
-              <Users size={10} className="inline mr-1" />
-              {formatNumber(total)} 人评
+                {eps}话
             </span>
           )}
         </div>
 
-        {/* Collection Stats */}
+          {/* 收藏统计 */}
         {collection && (
-          <div className="flex flex-wrap gap-2 text-[11px]">
-            <span className="flex items-center gap-1 text-pink-400">
-              <Heart size={10} />
-              想看 {formatNumber(collection.wish)}
+            <div className="flex items-center gap-2 mt-1.5 text-[10px]">
+              <span className="flex items-center gap-0.5 text-pink-400">
+                <Heart size={9} className="fill-pink-400" />
+                {formatNumber(collection.wish)}
             </span>
-            <span className="flex items-center gap-1 text-emerald-400">
-              <Bookmark size={10} />
-              看过 {formatNumber(collection.collect)}
+              <span className="flex items-center gap-0.5 text-emerald-400">
+                <Bookmark size={9} className="fill-emerald-400" />
+                {formatNumber(collection.collect)}
             </span>
-            <span className="flex items-center gap-1 text-blue-400">
-              <Eye size={10} />
-              在看 {formatNumber(collection.doing)}
-            </span>
-          </div>
-        )}
-
-        {/* Tags */}
-        {tags && tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-1">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 border border-slate-200 dark:border-white/5"
-              >
-                {tag}
+              <span className="flex items-center gap-0.5 text-blue-400">
+                <Eye size={9} />
+                {formatNumber(collection.doing)}
               </span>
-            ))}
           </div>
         )}
+        </div>
+      </div>
 
-        {/* Summary */}
+      {/* 简介 tooltip (仅桌面端) */}
         {summary && (
-          <div className="text-xs text-slate-500 dark:text-white/50 line-clamp-2 mt-1">{summary}</div>
-        )}
-
-        {/* Link */}
-        {url && (
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 mt-auto pt-2 text-xs font-medium text-orange-500 hover:text-orange-400 transition-colors"
-          >
-            Bangumi
-            <ExternalLink size={12} />
-          </a>
+        <div className="hidden sm:block absolute inset-x-0 bottom-0 p-3 bg-black/95 backdrop-blur-xl translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
+          <p className="text-[11px] text-white/80 line-clamp-4 leading-relaxed">
+            {summary}
+          </p>
+          {name_cn && name_cn !== name && (
+            <p className="mt-2 text-[10px] text-white/50 truncate">
+              {name}
+            </p>
         )}
       </div>
-    </motion.div>
+      )}
+    </motion.a>
   )
 }
+

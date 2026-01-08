@@ -49,8 +49,8 @@ export function StatsCorner() {
       const uvElement = document.getElementById('busuanzi_value_site_uv')
 
       if (pvElement && uvElement) {
-        const pvValue = parseInt(pvElement.textContent || '0', 10)
-        const uvValue = parseInt(uvElement.textContent || '0', 10)
+        const pvValue = parseInt(pvElement.textContent ?? '0', 10)
+        const uvValue = parseInt(uvElement.textContent ?? '0', 10)
 
         if (pvValue > 0 || uvValue > 0) {
           setPv(pvValue)
@@ -104,29 +104,29 @@ export function StatsCorner() {
     }
   }, [pv, uv, animateNumbers])
 
+  if (!visible) return null
+
   return (
     <motion.div
       className={cn(
-        'fixed bottom-6 left-4 sm:left-6 z-40',
-        'flex flex-col gap-2 px-3 py-2 sm:px-4 sm:py-3',
-        'rounded-2xl bg-[var(--glass-bg)] backdrop-blur-xl',
-        'border border-[var(--glass-border)] shadow-lg',
-        'transition-all duration-400',
-        !visible && 'opacity-0 translate-y-2.5'
+        'flex items-center gap-3 sm:gap-4 px-3 py-1.5 sm:px-4 sm:py-2',
+        'rounded-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm',
+        'border border-slate-200 dark:border-white/10 shadow-sm',
+        'text-xs sm:text-sm'
       )}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 10 }}
-      transition={{ duration: 0.4 }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
     >
-      <div className="flex items-center gap-2 text-sm" title="总访问量 (PV)">
-        <Eye size={16} className="text-orange-400 flex-shrink-0" />
+      <div className="flex items-center gap-1.5" title="总访问量 (PV)">
+        <Eye size={14} className="text-orange-400" />
         <span className="font-semibold text-[var(--text-primary)] tabular-nums">
           {displayPv}
         </span>
       </div>
-      <div className="h-px bg-[var(--border-color)]" />
-      <div className="flex items-center gap-2 text-sm" title="独立访客 (UV)">
-        <Users size={16} className="text-orange-400 flex-shrink-0" />
+      <div className="w-px h-3 bg-slate-300 dark:bg-white/20" />
+      <div className="flex items-center gap-1.5" title="独立访客 (UV)">
+        <Users size={14} className="text-orange-400" />
         <span className="font-semibold text-[var(--text-primary)] tabular-nums">
           {displayUv}
         </span>
