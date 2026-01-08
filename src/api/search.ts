@@ -85,7 +85,7 @@ export async function fetchRules(): Promise<Rule[]> {
 export async function searchAnime(
   query: string,
   rules: string[],
-  options: { episodes?: boolean } = {},
+  _options: Record<string, unknown> = {},
   callbacks: SearchCallbacks = {}
 ): Promise<void> {
   const { signal, onTotal, onProgress, onPlatformResult, onComplete, onError } = callbacks
@@ -98,9 +98,6 @@ export async function searchAnime(
   const formData = new FormData()
   formData.append('anime', query)
   formData.append('rules', rules.join(','))
-  if (options.episodes) {
-    formData.append('episodes', '1')
-  }
 
   try {
     const response = await fetch(`${getApiBaseUrl()}/api`, {

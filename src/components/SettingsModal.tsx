@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Monitor, Moon, Sun, Volume2, Server, RotateCcw, Image, ListVideo } from 'lucide-react'
+import { X, Monitor, Moon, Sun, Volume2, Server, RotateCcw, Image } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { playToggle, playTransitionUp, playTransitionDown, playTap } from '@/lib/sound'
 import { useUIStore, DEFAULT_BG_API } from '@/store/ui'
-import { useSearchStore } from '@/store/search'
 import type { Theme } from '@/lib/theme'
 
 const DEFAULT_API_URL = 'https://anime-search.saop.cc'
@@ -19,15 +18,8 @@ export function SettingsModal() {
     bgSettings, setBgSettings
   } = useUIStore()
   
-  const { getEpisodes, setGetEpisodes } = useSearchStore()
-  
   const [apiUrlInput, setApiUrlInput] = useState(customApiUrl)
   const [bgApiInput, setBgApiInput] = useState(bgSettings.apiUrl)
-
-  const handleEpisodesChange = (enabled: boolean) => {
-    playToggle()
-    setGetEpisodes(enabled)
-  }
 
   useEffect(() => {
     if (showSettings) {
@@ -81,16 +73,19 @@ export function SettingsModal() {
   }
 
   // 同步 store 中的值到本地状态
+  // 模态框打开时需要同步 store 值到输入框，这是预期行为
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setApiUrlInput(customApiUrl)
     setBgApiInput(bgSettings.apiUrl)
   }, [customApiUrl, bgSettings, showSettings])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   return createPortal(
     <AnimatePresence>
       {showSettings && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-md"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -146,16 +141,6 @@ export function SettingsModal() {
 
               {/* 搜索设置组 */}
               <SettingsGroup title="搜索">
-                <SettingsRow
-                  icon={<ListVideo size={18} />}
-                  label="获取集数"
-                  description="显示每个资源的集数列表"
-                >
-                  <ToggleSwitch 
-                    checked={getEpisodes} 
-                    onChange={handleEpisodesChange} 
-                  />
-                </SettingsRow>
                 <SettingsRow
                   icon={<Volume2 size={18} />}
                   label="音效"
@@ -445,7 +430,7 @@ function RepoCard({ repo }: RepoCardProps) {
       rel="noopener noreferrer"
       className={cn(
         'block p-4 rounded-xl transition-all duration-200',
-        'bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm',
+        'bg-white/70 dark:bg-slate-900/70',
         'border border-slate-200 dark:border-slate-700/50',
         'hover:border-slate-300 dark:hover:border-slate-600',
         'hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-slate-900/50',

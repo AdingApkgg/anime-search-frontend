@@ -49,8 +49,10 @@ export function StatsCorner() {
       const uvElement = document.getElementById('busuanzi_value_site_uv')
 
       if (pvElement && uvElement) {
-        const pvValue = parseInt(pvElement.textContent ?? '0', 10)
-        const uvValue = parseInt(uvElement.textContent ?? '0', 10)
+        const pvText = pvElement.textContent
+        const uvText = uvElement.textContent
+        const pvValue = parseInt(pvText || '0', 10)
+        const uvValue = parseInt(uvText || '0', 10)
 
         if (pvValue > 0 || uvValue > 0) {
           setPv(pvValue)
@@ -110,7 +112,7 @@ export function StatsCorner() {
     <motion.div
       className={cn(
         'flex items-center gap-3 sm:gap-4 px-3 py-1.5 sm:px-4 sm:py-2',
-        'rounded-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm',
+        'rounded-full bg-white/80 dark:bg-slate-800/80',
         'border border-slate-200 dark:border-white/10 shadow-sm',
         'text-xs sm:text-sm'
       )}

@@ -65,7 +65,7 @@ export function CommentsModal() {
     <AnimatePresence>
       {showComments && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -73,7 +73,7 @@ export function CommentsModal() {
           onClick={(e) => { if (e.target === e.currentTarget) handleClose() }}
         >
           <motion.div
-            className="w-[90%] max-w-2xl max-h-[85vh] flex flex-col rounded-2xl bg-[var(--modal-bg)] backdrop-blur-2xl border border-[var(--glass-border)] shadow-2xl max-sm:w-full max-sm:h-full max-sm:max-w-none max-sm:max-h-none max-sm:rounded-none"
+            className="w-[90%] max-w-2xl max-h-[85vh] flex flex-col rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-[var(--glass-border)] shadow-2xl max-sm:w-full max-sm:h-full max-sm:max-w-none max-sm:max-h-none max-sm:rounded-none"
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}

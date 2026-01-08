@@ -58,7 +58,7 @@ export function FloatingButtons() {
       <AnimatePresence>
         {showNavPanel && (
           <motion.div
-            className="absolute bottom-full right-0 mb-2 w-56 max-h-96 overflow-y-auto rounded-2xl bg-[var(--modal-bg)] backdrop-blur-xl border border-[var(--glass-border)] shadow-lg p-2"
+            className="absolute bottom-full right-0 mb-2 w-56 max-h-96 overflow-y-auto rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-[var(--glass-border)] shadow-lg p-2"
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -142,7 +142,7 @@ function FAB({ children, title, onClick, className, primary }: FABProps) {
     <button
       className={cn(
         'w-12 h-12 sm:w-13 sm:h-13 flex items-center justify-center rounded-full',
-        'backdrop-blur-xl border shadow-lg cursor-pointer',
+        'border shadow-lg cursor-pointer',
         'transition-all duration-300',
         'hover:-translate-y-0.5 hover:scale-110 hover:border-orange-500/50',
         'active:translate-y-0 active:scale-95',

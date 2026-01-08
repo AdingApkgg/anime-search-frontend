@@ -101,7 +101,7 @@ export async function searchBangumi(keyword: string, limit = 20): Promise<Bangum
   }
 
   const data = (await response.json()) as V0SearchResponse
-  return data.data ?? []
+  return data.data
 }
 
 /**

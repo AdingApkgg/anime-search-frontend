@@ -50,6 +50,8 @@
 html {
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
+  /* 预留滚动条空间，避免出现/消失时布局闪烁 */
+  scrollbar-gutter: stable;
 }
 
 body {

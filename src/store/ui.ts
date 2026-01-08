@@ -6,7 +6,7 @@ import { isSoundEnabled, setSoundEnabled as applySoundEnabled } from '@/lib/soun
 // 根据环境变量配置 API 地址
 // 开发环境: http://localhost:3000
 // 生产环境: https://anime-search.saop.cc
-const DEFAULT_API_URL = import.meta.env.VITE_API_BASE_URL as string || 'https://anime-search.saop.cc'
+const DEFAULT_API_URL = import.meta.env.VITE_API_BASE_URL ?? 'https://anime-search.saop.cc'
 const API_URL_STORAGE_KEY = 'anime-search-api-url'
 
 function getSavedApiUrl(): string {
@@ -23,7 +23,7 @@ function saveApiUrl(url: string): void {
 
 export function getApiBaseUrl(): string {
   const custom = localStorage.getItem(API_URL_STORAGE_KEY)
-  return custom?.trim() || DEFAULT_API_URL
+  return custom?.trim() ? custom.trim() : DEFAULT_API_URL
 }
 
 // ============ 背景设置 ============

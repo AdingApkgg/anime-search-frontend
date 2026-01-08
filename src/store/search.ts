@@ -19,15 +19,11 @@ interface SearchState {
   // Bangumi 信息
   bangumiList: BangumiInfo[]
 
-  // 选项
-  getEpisodes: boolean
-
   // 搜索控制器
   abortController: AbortController | null
 
   // Actions
   setQuery: (query: string) => void
-  setGetEpisodes: (value: boolean) => void
   toggleRule: (name: string) => void
   selectAllRules: () => void
   clearAllRules: () => void
@@ -49,13 +45,10 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   rulesLoading: true,
   rulesError: '',
   bangumiList: [],
-  getEpisodes: true,
   abortController: null,
 
   // Actions
   setQuery: (query) => { set({ query }); },
-
-  setGetEpisodes: (value) => { set({ getEpisodes: value }); },
 
   toggleRule: (name) => {
     const { selectedRules } = get()
@@ -96,7 +89,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   },
 
   search: async () => {
-    const { query, selectedRules, getEpisodes, abortController: oldController } = get()
+    const { query, selectedRules, abortController: oldController } = get()
 
     if (!query.trim()) return
 
@@ -129,7 +122,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     }
 
     try {
-      await searchAnime(query, rulesArray, { episodes: getEpisodes }, {
+      await searchAnime(query, rulesArray, {}, {
         signal: newController.signal,
         onTotal: (total) => {
           set({ progress: { current: 0, total } })

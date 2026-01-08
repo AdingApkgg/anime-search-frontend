@@ -23,7 +23,7 @@ export function BangumiCard() {
       {/* 卡片滚动容器 */}
       <div className="flex gap-3 px-3 sm:px-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-orange-500/30 hover:scrollbar-thumb-orange-500/50">
         {bangumiList.map((info, index) => (
-          <BangumiCardItem key={info.id ?? index} info={info} index={index} />
+          <BangumiCardItem key={info.id} info={info} index={index} />
         ))}
       </div>
     </div>
@@ -80,7 +80,7 @@ function BangumiCardItem({ info, index }: { info: BangumiInfo; index: number }) 
 
         {/* 评分徽章 */}
           {score && (
-          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10">
+          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/75 border border-white/10">
             <Star size={12} className="text-yellow-400 fill-yellow-400" />
             <span className="text-xs font-bold text-white">{score.toFixed(1)}</span>
           </div>
@@ -88,14 +88,14 @@ function BangumiCardItem({ info, index }: { info: BangumiInfo; index: number }) 
 
         {/* 排名徽章 */}
           {rank && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-orange-500/80 backdrop-blur-sm">
+          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-orange-500/90">
             <Hash size={10} className="text-white" />
             <span className="text-xs font-bold text-white">{rank}</span>
           </div>
         )}
 
         {/* 外部链接指示 */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <ExternalLink size={20} className="text-white" />
         </div>
 
@@ -144,7 +144,7 @@ function BangumiCardItem({ info, index }: { info: BangumiInfo; index: number }) 
 
       {/* 简介 tooltip (仅桌面端) */}
         {summary && (
-        <div className="hidden sm:block absolute inset-x-0 bottom-0 p-3 bg-black/95 backdrop-blur-xl translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
+        <div className="hidden sm:block absolute inset-x-0 bottom-0 p-3 bg-black/95 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
           <p className="text-[11px] text-white/80 line-clamp-4 leading-relaxed">
             {summary}
           </p>

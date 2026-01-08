@@ -123,9 +123,9 @@ export function Background() {
         </AnimatePresence>
       </div>
 
-      {/* Dark Overlay for readability */}
+      {/* Overlay for readability - 浅色模式更亮 */}
       <div 
-        className="fixed inset-0 pointer-events-none bg-black/40 dark:bg-black/60"
+        className="fixed inset-0 pointer-events-none dark:bg-black/60"
         style={{ zIndex: -15 }}
       />
 
