@@ -46,7 +46,7 @@ export function SearchResults() {
   }
 
   return (
-    <div id="results" className="max-w-4xl mx-auto px-4 flex flex-col gap-4 pb-8">
+    <div id="results" className="max-w-4xl mx-auto px-2 sm:px-4 flex flex-col gap-3 sm:gap-4 pb-8 overflow-hidden">
       {platforms.map((platform, index) => (
         <PlatformCard
           key={platform.name}
@@ -85,25 +85,26 @@ function PlatformCard({
 
   return (
     <motion.div
-      className="rounded-xl overflow-hidden bg-white/80 dark:bg-slate-800/70 border border-slate-200 dark:border-white/5 shadow-lg"
+      className="rounded-xl bg-white/80 dark:bg-slate-800/70 border border-slate-200 dark:border-white/5 shadow-lg overflow-hidden"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
       data-platform={platform.name}
+      layout="position"
     >
       {/* Header */}
-      <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-white/5">
-        <span className="text-sm font-bold" style={{ color }}>
+      <div className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 border-b border-slate-200 dark:border-white/5">
+        <span className="text-sm font-bold truncate" style={{ color }}>
           ● {platform.name}
         </span>
-        <span className="ml-auto px-2 py-1 rounded-md text-xs font-semibold bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/70">
+        <span className="ml-auto flex-shrink-0 px-2 py-1 rounded-md text-xs font-semibold bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/70">
           {platform.items.length} 结果
         </span>
       </div>
 
       {/* Results */}
       {platform.items.length > 0 ? (
-        <div className="p-2 flex flex-col gap-1">
+        <div className="p-1.5 sm:p-2 flex flex-col gap-1">
           {items.map((item, i) => (
             <ResultItem
               key={`${platform.name}-${String(i)}`}
@@ -154,12 +155,12 @@ function ResultItem({ item, index, expanded, onToggle }: ResultItemProps) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/40 border border-transparent hover:bg-orange-500/10 hover:border-orange-500/15 text-slate-900 dark:text-white transition-all group"
+        className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/40 border border-transparent hover:bg-orange-500/10 hover:border-orange-500/15 text-slate-900 dark:text-white transition-all group"
       >
-        <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-md text-xs font-bold bg-orange-500/15 text-orange-500 dark:text-orange-400">
+        <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-md text-xs font-bold bg-orange-500/15 text-orange-500 dark:text-orange-400">
           {index + 1}
         </div>
-        <div className="flex-1 min-w-0 text-sm font-medium truncate">{item.name}</div>
+        <div className="flex-1 min-w-0 text-xs sm:text-sm font-medium truncate">{item.name}</div>
         <ExternalLink
           size={14}
           className="flex-shrink-0 text-slate-400 dark:text-white/30 group-hover:text-orange-500 transition-colors"
@@ -169,28 +170,28 @@ function ResultItem({ item, index, expanded, onToggle }: ResultItemProps) {
   }
 
   return (
-    <div>
+    <div className="overflow-hidden">
       <div
-        className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/40 border border-transparent hover:bg-orange-500/10 hover:border-orange-500/15 text-slate-900 dark:text-white transition-all cursor-pointer"
+        className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/40 border border-transparent hover:bg-orange-500/10 hover:border-orange-500/15 text-slate-900 dark:text-white transition-all cursor-pointer"
         onClick={onToggle}
       >
-        <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-md text-xs font-bold bg-orange-500/15 text-orange-500 dark:text-orange-400">
+        <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-md text-xs font-bold bg-orange-500/15 text-orange-500 dark:text-orange-400">
           {index + 1}
         </div>
-        <div className="flex-1 min-w-0 text-sm font-medium truncate">{item.name}</div>
-        <div className="flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold bg-blue-500/15 text-blue-500 dark:text-blue-400">
-          <Play size={10} />
+        <div className="flex-1 min-w-0 text-xs sm:text-sm font-medium truncate">{item.name}</div>
+        <div className="flex-shrink-0 flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-semibold bg-blue-500/15 text-blue-500 dark:text-blue-400">
+          <Play size={10} className="hidden sm:block" />
           {epCount}
         </div>
         <button
-          className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-orange-500/10 text-orange-500 dark:text-orange-400 hover:bg-orange-500/20 transition-colors"
+          className="flex-shrink-0 flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium bg-orange-500/10 text-orange-500 dark:text-orange-400 hover:bg-orange-500/20 transition-colors"
           onClick={(e) => {
             e.stopPropagation()
             onToggle()
           }}
         >
           {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-          {expanded ? '收起' : '展开'}
+          <span className="hidden sm:inline">{expanded ? '收起' : '展开'}</span>
         </button>
         <a
           href={item.url}
@@ -203,10 +204,10 @@ function ResultItem({ item, index, expanded, onToggle }: ResultItemProps) {
         </a>
       </div>
 
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {expanded && (
           <motion.div
-            className="ml-9 mt-1 mb-1 p-3 rounded-lg bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-white/5"
+            className="ml-7 sm:ml-9 mr-1 mt-1 mb-1 p-2 sm:p-3 rounded-lg bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 overflow-hidden"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
@@ -226,9 +227,9 @@ function EpisodeRoadView({ road }: { road: EpisodeRoad }) {
   if (road.episodes.length === 0) return null
 
   return (
-    <div className="mb-3 last:mb-0">
+    <div className="mb-2 sm:mb-3 last:mb-0">
       {road.name && (
-        <div className="text-xs text-slate-500 dark:text-white/50 mb-1.5">{road.name}</div>
+        <div className="text-[10px] sm:text-xs text-slate-500 dark:text-white/50 mb-1 sm:mb-1.5">{road.name}</div>
       )}
       <div className="flex flex-wrap gap-1">
         {road.episodes.map((ep, i) => (
@@ -237,7 +238,7 @@ function EpisodeRoadView({ road }: { road: EpisodeRoad }) {
             href={ep.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-2 py-1 rounded text-xs font-medium bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-white/80 hover:bg-orange-500/15 hover:border-orange-500/30 hover:text-orange-500 dark:hover:text-orange-400 transition-all"
+            className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs font-medium bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-white/80 hover:bg-orange-500/15 hover:border-orange-500/30 hover:text-orange-500 dark:hover:text-orange-400 transition-all"
           >
             {ep.name}
           </a>
