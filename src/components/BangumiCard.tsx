@@ -10,7 +10,7 @@ export function BangumiCard() {
   if (bangumiList.length === 0) return null
 
   return (
-    <div className="max-w-5xl mx-auto px-2 sm:px-4 mb-3 sm:mb-4">
+    <div className="w-full max-w-5xl mx-auto px-2 sm:px-4 mb-3 sm:mb-4 overflow-hidden">
       <div className="flex gap-2 sm:gap-3 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-thin scrollbar-track-white/5 scrollbar-thumb-orange-500/30">
         {bangumiList.map((info, index) => (
           <BangumiCardItem key={info.id || index} info={info} index={index} />

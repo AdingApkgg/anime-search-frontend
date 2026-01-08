@@ -46,7 +46,7 @@ export function SearchResults() {
   }
 
   return (
-    <div id="results" className="max-w-5xl mx-auto px-2 sm:px-4 flex flex-col gap-2 sm:gap-3 pb-8 overflow-hidden">
+    <div id="results" className="w-full max-w-5xl mx-auto px-2 sm:px-4 flex flex-col gap-2 sm:gap-3 pb-8 overflow-hidden">
       {platforms.map((platform, index) => (
         <PlatformCard
           key={platform.name}
