@@ -1,0 +1,17 @@
+{
+  "name": "AnimeSearch - 动漫聚合搜索",
+  "short_name": "AnimeSearch",
+  "description": "在线动漫聚合搜索引擎",
+  "theme_color": "#f97316",
+  "background_color": "#0f172a",
+  "display": "standalone",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
