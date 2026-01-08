@@ -28,7 +28,7 @@ export function getSavedTheme(): Theme {
   if (saved === 'light' || saved === 'dark' || saved === 'system') {
     return saved
   }
-  return 'dark'
+  return 'system' // 默认跟随系统
 }
 
 // 获取实际显示的主题
