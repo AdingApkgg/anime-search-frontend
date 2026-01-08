@@ -140,7 +140,7 @@ export function SettingsModal() {
                   </p>
                   <p className="text-[var(--text-muted)] text-xs">
                     <a
-                      href="https://github.com/Moe-Sakura"
+                      href="https://github.com/AdingApkgg/anime-search-frontend"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-orange-500 hover:underline"

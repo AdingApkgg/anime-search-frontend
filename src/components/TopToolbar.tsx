@@ -83,7 +83,7 @@ export function TopToolbar() {
 
       {/* GitHub */}
       <a
-        href="https://github.com/Moe-Sakura"
+        href="https://github.com/AdingApkgg/anime-search-frontend"
         target="_blank"
         rel="noopener noreferrer"
         className={cn(
