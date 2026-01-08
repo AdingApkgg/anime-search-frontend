@@ -21,8 +21,12 @@ export function SearchHeader() {
     selectAllRules,
     clearAllRules,
     loadRules,
-    search
+    search,
+    platforms
   } = useSearchStore()
+  
+  // 有结果时减少 header 高度
+  const hasResults = platforms.length > 0
 
   const [showRules, setShowRules] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -56,10 +60,18 @@ export function SearchHeader() {
   }
 
   return (
-    <header className="flex flex-col items-center justify-end px-4 min-h-[50vh]">
+    <header 
+      className={cn(
+        "flex flex-col items-center justify-end px-2 sm:px-4 transition-all duration-500",
+        hasResults ? "pt-16 sm:pt-4 pb-4 sm:pb-6" : "min-h-[45vh] sm:min-h-[50vh]"
+      )}
+    >
       {/* Brand */}
       <motion.h1
-        className="text-3xl font-extrabold text-[var(--text-primary)] tracking-tight mb-6"
+        className={cn(
+          "font-extrabold text-[var(--text-primary)] tracking-tight transition-all duration-300",
+          hasResults ? "text-xl sm:text-2xl mb-3 sm:mb-4" : "text-2xl sm:text-3xl mb-4 sm:mb-6"
+        )}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -69,7 +81,10 @@ export function SearchHeader() {
 
       {/* Search Box */}
       <motion.div
-        className="w-full max-w-lg"
+        className={cn(
+          "w-full transition-all duration-300",
+          hasResults ? "max-w-xl" : "max-w-lg"
+        )}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
@@ -81,12 +96,13 @@ export function SearchHeader() {
               'bg-white/80 dark:bg-slate-800/80 border-slate-200 dark:border-slate-600/50 shadow-lg',
               'hover:border-slate-300 dark:hover:border-slate-500/50',
               'focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/30',
-              isSearching && 'border-orange-500 ring-2 ring-orange-500/30'
+              isSearching && 'border-orange-500 ring-2 ring-orange-500/30',
+              hasResults && 'shadow-md'
             )}
           >
             <div
               className={cn(
-                'px-4 text-[var(--text-muted)] transition-colors',
+                'px-3 sm:px-4 text-[var(--text-muted)] transition-colors',
                 'focus-within:text-orange-500',
                 isSearching && 'animate-spin'
               )}
@@ -135,7 +151,10 @@ export function SearchHeader() {
 
       {/* Options */}
       <motion.div
-        className="flex flex-wrap items-center justify-center gap-2 mt-4"
+        className={cn(
+          "flex flex-wrap items-center justify-center gap-2",
+          hasResults ? "mt-2 sm:mt-3" : "mt-3 sm:mt-4"
+        )}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.2 }}
@@ -143,22 +162,22 @@ export function SearchHeader() {
         <button
           type="button"
           className={cn(
-            'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all border',
-            'bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-500 text-slate-700 dark:text-slate-200 shadow-md',
+            'flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all border',
+            'bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-500 text-slate-700 dark:text-slate-200 shadow-sm sm:shadow-md',
             'hover:bg-slate-200 dark:hover:bg-slate-600 hover:border-slate-400',
             getEpisodes && 'bg-orange-100 dark:bg-orange-900 border-orange-400 dark:border-orange-500 text-orange-600 dark:text-orange-300'
           )}
           onClick={handleToggleEpisodes}
         >
           <ListVideo size={14} />
-          获取集数
+          <span className="hidden xs:inline">获取</span>集数
         </button>
 
         <button
           type="button"
           className={cn(
-            'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all border',
-            'bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-500 text-slate-700 dark:text-slate-200 shadow-md',
+            'flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all border',
+            'bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-500 text-slate-700 dark:text-slate-200 shadow-sm sm:shadow-md',
             'hover:bg-slate-200 dark:hover:bg-slate-600 hover:border-slate-400',
             showRules && 'bg-orange-100 dark:bg-orange-900 border-orange-400 dark:border-orange-500 text-orange-600 dark:text-orange-300'
           )}
