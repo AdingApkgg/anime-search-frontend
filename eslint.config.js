@@ -6,9 +6,10 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'vite.config.ts', '.history']),
+  globalIgnores(['dist', 'out', '.next', 'public/sw.js', '.history']),
   {
     files: ['**/*.{ts,tsx}'],
+    ignores: ['**/*.d.ts'],
     extends: [
       js.configs.recommended,
       tseslint.configs.strictTypeChecked,
@@ -35,10 +36,12 @@ export default defineConfig([
       '@typescript-eslint/prefer-nullish-coalescing': 'warn',
       '@typescript-eslint/prefer-optional-chain': 'warn',
       '@typescript-eslint/restrict-template-expressions': 'off',
+      '@typescript-eslint/no-confusing-void-expression': 'off',
       
       // React 规则
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
+      'react-refresh/only-export-components': 'off',
       
       // 通用规则
       'no-console': ['warn', { allow: ['warn', 'error'] }],

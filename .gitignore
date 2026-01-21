@@ -1,26 +1,30 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
+# Dependencies
 node_modules
-dist
-dist-ssr
-*.local
 
-# Editor directories and files
+# Next.js
+.next/
+out/
+
+# Serwist generated
+public/sw.js
+public/sw.js.map
+
+# Build
+dist
+
+# Environment
+*.local
+.env*.local
+
+# Logs
+*.log
+
+# Editor
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
 *.sw?
 .history
-.history
+
+# OS
+.DS_Store

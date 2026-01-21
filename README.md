@@ -87,18 +87,3 @@ VITE_API_BASE_URL=https://anime-search.saop.cc
 # Bangumi API
 VITE_BANGUMI_API_URL=https://anime-search.saop.cc/bangumi
 ```
-
-## 快捷键
-
-| 按键 | 功能 |
-|------|------|
-| `/` | 聚焦搜索框 |
-| `Enter` | 搜索 |
-| `Esc` | 关闭面板 |
-| `↑` `↓` | 上/下一个站点 |
-| `Home` | 返回顶部 |
-| `?` | 显示快捷键帮助 |
-
-## 许可证
-
-MIT
