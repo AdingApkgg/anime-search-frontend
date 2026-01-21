@@ -55,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen antialiased">
-        <SerwistProvider>
+        <SerwistProvider swUrl="/sw.js">
           {children}
         </SerwistProvider>
 
