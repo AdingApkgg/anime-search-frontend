@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
+import { SerwistProvider } from './serwist'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -54,7 +55,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen antialiased">
-        {children}
+        <SerwistProvider>
+          {children}
+        </SerwistProvider>
 
         {/* 不蒜子统计 */}
         <div id="busuanzi_container" style={{ display: 'none' }}>
