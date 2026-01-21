@@ -106,9 +106,9 @@ export function Background() {
         className="fixed inset-0 pointer-events-none -z-10"
         style={{
           backgroundImage: `
-            radial-gradient(ellipse 80% 50% at 50% -20%, hsl(var(--primary) / 0.15), transparent),
-            radial-gradient(ellipse 60% 40% at 80% 100%, hsl(var(--primary) / 0.1), transparent),
-            radial-gradient(ellipse 40% 30% at 10% 60%, hsl(var(--primary) / 0.08), transparent)
+            radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in oklch, var(--primary) 15%, transparent), transparent),
+            radial-gradient(ellipse 60% 40% at 80% 100%, color-mix(in oklch, var(--primary) 10%, transparent), transparent),
+            radial-gradient(ellipse 40% 30% at 10% 60%, color-mix(in oklch, var(--primary) 8%, transparent), transparent)
           `
         }}
       />

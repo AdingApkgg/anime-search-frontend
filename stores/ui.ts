@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { setSoundEnabled as setSoundModule } from '@/lib/sound'
 
 // SSR 安全的 localStorage 访问
 const isBrowser = typeof window !== 'undefined'
@@ -184,6 +185,7 @@ export const useUIStore = create<UIState>((set) => ({
   closeNavPanel: () => set({ showNavPanel: false }),
 
   setSoundEnabled: (enabled) => {
+    setSoundModule(enabled)
     saveSoundEnabled(enabled)
     set({ soundEnabled: enabled })
   },
@@ -223,6 +225,9 @@ export const useUIStore = create<UIState>((set) => ({
     const savedBgApi = getSavedBgApiUrl()
     const themeHue = getSavedThemeHue()
     const uiOpacity = getSavedOpacity()
+    
+    // 同步音效模块状态
+    setSoundModule(soundEnabled)
     
     applyThemeHue(themeHue)
     applyOpacity(uiOpacity)
