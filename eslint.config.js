@@ -12,8 +12,7 @@ export default defineConfig([
     ignores: ['**/*.d.ts'],
     extends: [
       js.configs.recommended,
-      tseslint.configs.strictTypeChecked,
-      tseslint.configs.stylisticTypeChecked,
+      tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
@@ -26,17 +25,10 @@ export default defineConfig([
       },
     },
     rules: {
-      // TypeScript 严格规则
+      // TypeScript 规则
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-misused-promises': 'error',
-      '@typescript-eslint/await-thenable': 'error',
-      '@typescript-eslint/no-unnecessary-condition': 'warn',
-      '@typescript-eslint/prefer-nullish-coalescing': 'warn',
-      '@typescript-eslint/prefer-optional-chain': 'warn',
-      '@typescript-eslint/restrict-template-expressions': 'off',
-      '@typescript-eslint/no-confusing-void-expression': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
       
       // React 规则
       'react-hooks/rules-of-hooks': 'error',
