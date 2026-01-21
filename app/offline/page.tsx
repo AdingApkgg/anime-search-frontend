@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/button'
 
 export default function OfflinePage() {
   const handleRetry = () => {
-    if (typeof window !== 'undefined') {
-      window.location.reload()
-    }
+    // @ts-expect-error - window is available in browser environment
+    globalThis.location?.reload()
   }
 
   return (
