@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button'
 
 export default function OfflinePage() {
   const handleRetry = () => {
-    window.location.reload()
+    if (typeof window !== 'undefined') {
+      window.location.reload()
+    }
   }
 
   return (
