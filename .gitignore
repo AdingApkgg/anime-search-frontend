@@ -1,30 +1,41 @@
 # Dependencies
-node_modules
+node_modules/
 
 # Next.js
 .next/
 out/
 
-# Serwist generated
-public/sw.js
+# Serwist
 public/sw.js.map
 
 # Build
-dist
+dist/
 
 # Environment
-*.local
-.env*.local
+.env
+.env.*
+!.env.example
 
 # Logs
 *.log
+npm-debug.log*
+pnpm-debug.log*
 
 # Editor
-.vscode/*
+.vscode/
 !.vscode/extensions.json
-.idea
-*.sw?
-.history
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+.history/
 
 # OS
 .DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# Debug
+.pnpm-debug.log
