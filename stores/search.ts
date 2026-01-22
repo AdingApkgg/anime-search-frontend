@@ -114,7 +114,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     const timeoutId = setTimeout(() => {
       const { isSearching } = get()
       if (isSearching) {
-        console.log('搜索超时 (15s)，自动断开')
+        console.warn('搜索超时 (15s)，自动断开')
         newController.abort()
         set({ isSearching: false })
       }

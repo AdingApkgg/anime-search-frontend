@@ -1,6 +1,7 @@
 'use client'
 
-import { memo, useState } from 'react'
+import { memo, useState, useCallback, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ExternalLink, Star, Trophy, Calendar, Play, Heart, Eye, Bookmark, Search, Tv, Info, X } from 'lucide-react'
 import { cn, formatNumber } from '@/lib/utils'
@@ -26,8 +27,66 @@ const item = {
   }
 }
 
+// 视口定位的简介浮层状态
+type SummaryOverlayState = {
+  open: boolean
+  summary: string
+  title: string
+  anchorRect: DOMRect | null
+}
+
 export function BangumiCard() {
   const { bangumiList } = useSearchStore()
+  const hideTimerRef = useRef<number | null>(null)
+  const [overlay, setOverlay] = useState<SummaryOverlayState>({
+    open: false,
+    summary: '',
+    title: '',
+    anchorRect: null
+  })
+
+  const clearHideTimer = useCallback(() => {
+    if (hideTimerRef.current) {
+      window.clearTimeout(hideTimerRef.current)
+      hideTimerRef.current = null
+    }
+  }, [])
+
+  const openOverlay = useCallback((anchor: HTMLElement, summary: string, title: string) => {
+    clearHideTimer()
+    setOverlay({
+      open: true,
+      summary,
+      title,
+      anchorRect: anchor.getBoundingClientRect()
+    })
+  }, [clearHideTimer])
+
+  const requestCloseOverlay = useCallback(() => {
+    clearHideTimer()
+    hideTimerRef.current = window.setTimeout(() => {
+      setOverlay(prev => ({ ...prev, open: false }))
+      hideTimerRef.current = null
+    }, 100)
+  }, [clearHideTimer])
+
+  const keepOverlayOpen = useCallback(() => {
+    clearHideTimer()
+  }, [clearHideTimer])
+
+  const closeOverlayNow = useCallback(() => {
+    clearHideTimer()
+    setOverlay(prev => ({ ...prev, open: false }))
+  }, [clearHideTimer])
+
+  // 清理定时器
+  useEffect(() => {
+    return () => {
+      if (hideTimerRef.current) {
+        window.clearTimeout(hideTimerRef.current)
+      }
+    }
+  }, [])
 
   if (bangumiList.length === 0) return null
 
@@ -47,28 +106,143 @@ export function BangumiCard() {
         <span className="text-xs text-muted-foreground tabular-nums">{bangumiList.length} 条匹配</span>
       </motion.div>
 
-      {/* 滚动容器 - 桌面端预留 tooltip 空间 */}
-      <div className="sm:-mt-24 overflow-x-auto pb-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/20 hover:scrollbar-thumb-primary/40">
+      {/* 滚动容器 */}
+      <div className="overflow-x-auto pb-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/20 hover:scrollbar-thumb-primary/40">
         <motion.div
-          className="flex gap-2.5 sm:gap-3 px-3 sm:px-4 sm:pt-24 snap-x snap-mandatory"
+          className="flex gap-2.5 sm:gap-3 px-3 sm:px-4 snap-x snap-mandatory"
           variants={container}
           initial="hidden"
           animate="show"
         >
           {bangumiList.map((info) => (
-            <BangumiCardItem key={info.id} info={info} />
+            <BangumiCardItem
+              key={info.id}
+              info={info}
+              onHoverSummary={openOverlay}
+              onLeaveSummary={requestCloseOverlay}
+              onCloseSummary={closeOverlayNow}
+            />
           ))}
         </motion.div>
       </div>
+
+      {/* 基于视口定位的简介浮层 */}
+      <SummaryOverlay
+        {...overlay}
+        onMouseEnter={keepOverlayOpen}
+        onMouseLeave={requestCloseOverlay}
+        onClose={closeOverlayNow}
+      />
     </div>
   )
 }
 
-const BangumiCardItem = memo(function BangumiCardItem({ info }: { info: BangumiInfo }) {
+// 基于视口定位的简介浮层组件
+function SummaryOverlay({
+  open,
+  summary,
+  title,
+  anchorRect,
+  onMouseEnter,
+  onMouseLeave,
+  onClose
+}: SummaryOverlayState & {
+  onMouseEnter: () => void
+  onMouseLeave: () => void
+  onClose: () => void
+}) {
+  // 客户端检测：直接检查 window 是否存在
+  if (typeof window === 'undefined' || !open || !anchorRect || !summary) return null
+
+  // 计算视口定位
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  const margin = 12
+  const overlayWidth = Math.min(320, vw - margin * 2)
+  const overlayMaxHeight = Math.min(200, vh * 0.4)
+
+  // 水平居中于锚点
+  let left = anchorRect.left + anchorRect.width / 2 - overlayWidth / 2
+  left = Math.max(margin, Math.min(left, vw - overlayWidth - margin))
+
+  // 优先显示在上方，空间不足则显示在下方
+  const spaceAbove = anchorRect.top - margin
+  const spaceBelow = vh - anchorRect.bottom - margin
+  const preferTop = spaceAbove >= overlayMaxHeight || spaceAbove > spaceBelow
+
+  let top: number
+  if (preferTop) {
+    // 显示在上方
+    top = Math.max(margin, anchorRect.top - overlayMaxHeight - 8)
+  } else {
+    // 显示在下方
+    top = anchorRect.bottom + 8
+  }
+
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed z-[9999] pointer-events-auto"
+          style={{ top, left, width: overlayWidth }}
+          initial={{ opacity: 0, y: preferTop ? 8 : -8, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: preferTop ? 8 : -8, scale: 0.96 }}
+          transition={{ duration: 0.15, ease: 'easeOut' }}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+        >
+          <div className="glass border border-white/15 rounded-xl shadow-2xl overflow-hidden">
+            {/* 标题栏 */}
+            <div className="flex items-center justify-between px-3 py-2 border-b border-white/10 bg-white/5">
+              <span className="text-xs font-medium text-foreground truncate pr-2">{title}</span>
+              <button
+                onClick={onClose}
+                className="size-5 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors"
+              >
+                <X size={12} />
+              </button>
+            </div>
+            {/* 内容 */}
+            <div 
+              className="p-3 text-xs text-foreground/90 leading-relaxed overflow-y-auto"
+              style={{ maxHeight: overlayMaxHeight - 36 }}
+            >
+              {summary}
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body
+  )
+}
+
+// 检测是否支持 hover（桌面端）- 使用惰性初始化避免 effect 中调用 setState
+function useHoverCapable() {
+  const [canHover] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.matchMedia?.('(hover: hover) and (pointer: fine)')?.matches ?? false
+  })
+  return canHover
+}
+
+const BangumiCardItem = memo(function BangumiCardItem({
+  info,
+  onHoverSummary,
+  onLeaveSummary,
+  onCloseSummary
+}: {
+  info: BangumiInfo
+  onHoverSummary: (anchor: HTMLElement, summary: string, title: string) => void
+  onLeaveSummary: () => void
+  onCloseSummary: () => void
+}) {
   const { name, name_cn, image, score, rank, air_date, summary, url, eps, collection } = info
   const { setQuery, isSearching } = useSearchStore()
   const displayName = name_cn ?? name
-  const [showSummary, setShowSummary] = useState(false)
+  const canHover = useHoverCapable()
+  const cardRef = useRef<HTMLDivElement>(null)
 
   // 点击卡片：填入动漫名并聚焦搜索框（搜索中禁用）
   const handleCardClick = () => {
@@ -91,11 +265,20 @@ const BangumiCardItem = memo(function BangumiCardItem({ info }: { info: BangumiI
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
-  // 移动端：点击简介按钮
+  // 点击简介按钮：打开视口定位的浮层
   const handleInfoClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     playTap()
-    setShowSummary(!showSummary)
+    if (cardRef.current && summary) {
+      onHoverSummary(cardRef.current, summary, displayName)
+    }
+  }
+
+  // 桌面端悬浮：打开视口定位的浮层
+  const handleMouseEnter = () => {
+    if (canHover && cardRef.current && summary) {
+      onHoverSummary(cardRef.current, summary, displayName)
+    }
   }
 
   // 评分徽章样式
@@ -111,6 +294,7 @@ const BangumiCardItem = memo(function BangumiCardItem({ info }: { info: BangumiI
 
   return (
     <motion.div
+      ref={cardRef}
       className={cn(
         "group relative flex-shrink-0 w-[140px] sm:w-[180px] snap-start",
         isSearching ? "cursor-not-allowed opacity-50" : "cursor-pointer"
@@ -119,16 +303,10 @@ const BangumiCardItem = memo(function BangumiCardItem({ info }: { info: BangumiI
       whileHover={isSearching ? {} : { y: -6, transition: { type: 'spring', stiffness: 400, damping: 20 } }}
       whileTap={isSearching ? {} : { scale: 0.97 }}
       onClick={handleCardClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={canHover ? onLeaveSummary : undefined}
+      onPointerDown={onCloseSummary}
     >
-      {/* 桌面端：悬浮时显示的简介 - 定位在卡片上方 */}
-      {summary && (
-        <div className="hidden sm:block absolute bottom-full left-0 right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
-          <div className="glass border border-white/10 rounded-xl p-3 shadow-xl text-xs text-foreground/90 line-clamp-4 leading-relaxed">
-            {summary}
-          </div>
-        </div>
-      )}
-
       {/* 卡片容器 - 使用 glass 效果 */}
       <div className="relative rounded-xl sm:rounded-2xl overflow-hidden glass-muted border border-white/10 shadow-lg sm:group-hover:shadow-2xl sm:group-hover:shadow-primary/10 sm:group-hover:border-primary/30 transition-all duration-300">
         {/* 封面图 */}
@@ -163,20 +341,20 @@ const BangumiCardItem = memo(function BangumiCardItem({ info }: { info: BangumiI
             </div>
           )}
 
-          {/* 右上角：移动端显示操作按钮组，桌面端显示排名 */}
+          {/* 右上角：操作按钮组和排名 */}
           <div className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 flex items-center gap-1">
-            {/* 移动端：简介按钮（有简介时显示） */}
+            {/* 简介按钮（有简介时显示） */}
             {summary && (
               <button
-                className="sm:hidden size-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white active:bg-black/70 transition-colors"
+                className="size-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white active:bg-black/70 hover:bg-black/70 transition-colors"
                 onClick={handleInfoClick}
               >
-                {showSummary ? <X size={12} /> : <Info size={12} />}
+                <Info size={12} />
               </button>
             )}
-            {/* 移动端：外链按钮 */}
+            {/* 外链按钮 */}
             <button
-              className="sm:hidden size-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white active:bg-black/70 transition-colors"
+              className="size-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white active:bg-black/70 hover:bg-black/70 transition-colors"
               onClick={handleExternalClick}
             >
               <ExternalLink size={12} />
@@ -209,24 +387,6 @@ const BangumiCardItem = memo(function BangumiCardItem({ info }: { info: BangumiI
               <ExternalLink size={14} />
             </motion.button>
           </div>
-
-          {/* 移动端：简介浮层 */}
-          <AnimatePresence>
-            {showSummary && summary && (
-              <motion.div
-                className="sm:hidden absolute inset-0 bg-black/80 backdrop-blur-sm p-3 flex items-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                onClick={handleInfoClick}
-              >
-                <p className="text-[11px] text-white/90 leading-relaxed line-clamp-[8]">
-                  {summary}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           {/* 底部标题信息 */}
           <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
