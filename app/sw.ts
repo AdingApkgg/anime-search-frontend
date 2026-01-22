@@ -4,7 +4,7 @@
 
 import { defaultCache } from '@serwist/next/worker'
 import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist'
-import { Serwist, CacheFirst, NetworkFirst, StaleWhileRevalidate } from 'serwist'
+import { Serwist, CacheFirst, NetworkFirst, StaleWhileRevalidate, ExpirationPlugin } from 'serwist'
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -17,15 +17,38 @@ declare const self: ServiceWorkerGlobalScope
 // 自定义缓存策略
 const customCache = [
   ...defaultCache,
-  // 图片缓存 - 优先使用缓存
+  
+  // 字体缓存 - 优先缓存，长期有效
+  {
+    matcher: ({ request }: { request: Request }) => 
+      request.destination === 'font',
+    handler: new CacheFirst({
+      cacheName: 'fonts-cache',
+      plugins: [
+        new ExpirationPlugin({
+          maxEntries: 50,
+          maxAgeSeconds: 60 * 60 * 24 * 365, // 1年
+        }),
+      ],
+    }),
+  },
+  
+  // 图片缓存 - 优先使用缓存，限制数量
   {
     matcher: ({ request }: { request: Request }) => 
       request.destination === 'image',
     handler: new CacheFirst({
       cacheName: 'images-cache',
       matchOptions: { ignoreVary: true },
+      plugins: [
+        new ExpirationPlugin({
+          maxEntries: 100,
+          maxAgeSeconds: 60 * 60 * 24 * 30, // 30天
+        }),
+      ],
     }),
   },
+  
   // API 请求 - 网络优先，离线时使用缓存
   {
     matcher: ({ url }: { url: URL }) => 
@@ -34,16 +57,28 @@ const customCache = [
     handler: new NetworkFirst({
       cacheName: 'api-cache',
       networkTimeoutSeconds: 10,
+      plugins: [
+        new ExpirationPlugin({
+          maxEntries: 50,
+          maxAgeSeconds: 60 * 60 * 24, // 1天
+        }),
+      ],
     }),
   },
-  // 静态资源 - 后台更新
+  
+  // 静态资源 (JS/CSS) - 后台更新
   {
     matcher: ({ request }: { request: Request }) =>
       request.destination === 'script' ||
-      request.destination === 'style' ||
-      request.destination === 'font',
+      request.destination === 'style',
     handler: new StaleWhileRevalidate({
       cacheName: 'static-cache',
+      plugins: [
+        new ExpirationPlugin({
+          maxEntries: 100,
+          maxAgeSeconds: 60 * 60 * 24 * 7, // 7天
+        }),
+      ],
     }),
   },
 ]
