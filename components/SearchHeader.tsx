@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { StatsCorner } from './StatsCorner'
+import { BangumiCard } from './BangumiCard'
 
 export function SearchHeader() {
   const {
@@ -68,6 +69,9 @@ export function SearchHeader() {
       "flex flex-col items-center justify-center px-2 sm:px-4 transition-all duration-500",
       hasResults ? "py-6 sm:py-8" : "py-8 sm:py-12 min-h-svh"
     )}>
+      {/* Bangumi 卡片 - 显示在标题上方 */}
+      <BangumiCard />
+
       {/* Brand */}
       <motion.h1
         className="font-extrabold tracking-tight text-4xl sm:text-5xl lg:text-6xl mb-4 sm:mb-6 text-white"

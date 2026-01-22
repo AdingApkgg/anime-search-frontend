@@ -3,7 +3,6 @@
 import { useEffect } from 'react'
 import { Background } from '@/components/Background'
 import { SearchHeader } from '@/components/SearchHeader'
-import { BangumiCard } from '@/components/BangumiCard'
 import { SearchResults } from '@/components/SearchResults'
 import { FloatingButtons } from '@/components/FloatingButtons'
 import { CommentsModal } from '@/components/CommentsModal'
@@ -30,7 +29,6 @@ export default function HomePage() {
       <Background />
       <main className="flex flex-col min-h-screen">
         <SearchHeader />
-        <BangumiCard />
         <SearchResults />
         <FloatingButtons />
       </main>

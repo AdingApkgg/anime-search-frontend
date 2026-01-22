@@ -35,22 +35,8 @@ export function BangumiCard() {
 
   return (
     <div className="w-full mb-4 sm:mb-6">
-      <motion.div
-        className="flex items-center gap-2 px-3 sm:px-4 mb-3"
-        initial={{ opacity: 0, x: -12 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.35, ease: 'easeOut' }}
-      >
-        <div className="size-6 rounded-lg bg-gradient-to-br from-pink-500 via-rose-500 to-primary flex items-center justify-center shadow-sm">
-          <Tv size={13} className="text-white" />
-        </div>
-        <span className="text-sm font-semibold text-foreground">Bangumi</span>
-        <div className="h-4 w-px bg-border/60" />
-        <span className="text-xs text-muted-foreground tabular-nums">{bangumiList.length} 条匹配</span>
-      </motion.div>
-
       {/* 滚动容器 */}
-      <div className="overflow-x-auto pb-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/20 hover:scrollbar-thumb-primary/40">
+      <div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/20 hover:scrollbar-thumb-primary/40">
         <motion.div
           className="flex gap-2.5 sm:gap-3 px-3 sm:px-4 snap-x snap-mandatory"
           variants={container}
@@ -66,6 +52,21 @@ export function BangumiCard() {
           ))}
         </motion.div>
       </div>
+
+      {/* Bangumi 标签 - 左下方 */}
+      <motion.div
+        className="flex items-center gap-2 px-3 sm:px-4 mt-2"
+        initial={{ opacity: 0, x: -12 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+      >
+        <div className="size-5 rounded-md bg-gradient-to-br from-pink-500 via-rose-500 to-primary flex items-center justify-center shadow-sm">
+          <Tv size={11} className="text-white" />
+        </div>
+        <span className="text-xs font-semibold text-foreground/80">Bangumi</span>
+        <div className="h-3 w-px bg-border/50" />
+        <span className="text-[10px] text-muted-foreground tabular-nums">{bangumiList.length} 条匹配</span>
+      </motion.div>
 
       {/* 详情模态框 */}
       <DetailModal info={detailInfo} onClose={() => setDetailInfo(null)} />
