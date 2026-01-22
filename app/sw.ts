@@ -2,7 +2,6 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
-import { defaultCache } from '@serwist/next/worker'
 import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist'
 import { Serwist, CacheFirst, NetworkFirst, StaleWhileRevalidate, ExpirationPlugin } from 'serwist'
 
@@ -15,9 +14,7 @@ declare global {
 declare const self: ServiceWorkerGlobalScope
 
 // 自定义缓存策略
-const customCache = [
-  ...defaultCache,
-  
+const runtimeCaching = [
   // 字体缓存 - 优先缓存，长期有效
   {
     matcher: ({ request }: { request: Request }) => 
@@ -88,7 +85,7 @@ const serwist = new Serwist({
   skipWaiting: false, // 由用户控制更新时机
   clientsClaim: true,
   navigationPreload: true,
-  runtimeCaching: customCache,
+  runtimeCaching,
   fallbacks: {
     entries: [
       {
