@@ -30,12 +30,8 @@ export function SerwistProvider({ children }: SerwistProviderProps) {
   const [hasUpdate, setHasUpdate] = useState(false)
 
   useEffect(() => {
-    // 仅在生产环境且浏览器支持 Service Worker 时注册
-    if (
-      typeof window === 'undefined' ||
-      !('serviceWorker' in navigator) ||
-      process.env.NODE_ENV === 'development'
-    ) {
+    // 浏览器不支持 Service Worker 时跳过
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
       return
     }
 
