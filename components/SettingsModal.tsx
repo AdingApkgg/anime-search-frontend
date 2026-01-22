@@ -219,8 +219,9 @@ export function SettingsModal() {
         {/* 关于 */}
         <SettingsSection title="关于项目" index={3}>
           <div className="grid gap-3 p-3">
-            <RepoCard name="anime-search-frontend" index={0} />
-            <RepoCard name="anime-search-api" index={1} />
+            <ContributionChart themeHue={themeHue} index={0} />
+            <RepoCard name="anime-search-frontend" index={1} />
+            <RepoCard name="anime-search-api" index={2} />
           </div>
         </SettingsSection>
       </ModalContent>
@@ -292,6 +293,40 @@ async function sha256(message: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
+// OKLCH to RGB 转换
+function oklchToHex(l: number, c: number, h: number): string {
+  // Convert OKLCH to OKLab
+  const hRad = h * Math.PI / 180
+  const a = c * Math.cos(hRad)
+  const b = c * Math.sin(hRad)
+  
+  // OKLab to linear RGB
+  const l_ = l + 0.3963377774 * a + 0.2158037573 * b
+  const m_ = l - 0.1055613458 * a - 0.0638541728 * b
+  const s_ = l - 0.0894841775 * a - 1.2914855480 * b
+  
+  const l3 = l_ * l_ * l_
+  const m3 = m_ * m_ * m_
+  const s3 = s_ * s_ * s_
+  
+  const r = +4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3
+  const g = -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3
+  const bVal = -0.0041960863 * l3 - 0.7034186147 * m3 + 1.7076147010 * s3
+  
+  // Linear RGB to sRGB
+  const toSrgb = (x: number) => {
+    if (x <= 0) return 0
+    if (x >= 1) return 255
+    return Math.round((x <= 0.0031308 ? 12.92 * x : 1.055 * Math.pow(x, 1/2.4) - 0.055) * 255)
+  }
+  
+  const rr = toSrgb(r).toString(16).padStart(2, '0')
+  const gg = toSrgb(g).toString(16).padStart(2, '0')
+  const bb = toSrgb(bVal).toString(16).padStart(2, '0')
+  
+  return `${rr}${gg}${bb}`.toUpperCase()
+}
+
 // 获取当前日期的 YYMMDD 格式
 function getDateString(): string {
   const now = new Date()
@@ -343,6 +378,41 @@ function RepoCard({
       ) : (
         <div className="w-full aspect-[2/1] bg-muted animate-pulse" />
       )}
+    </motion.a>
+  )
+}
+
+// GitHub 贡献图表
+function ContributionChart({
+  themeHue,
+  index = 0
+}: {
+  themeHue: number
+  index?: number
+}) {
+  // 将 oklch(0.65 0.19 hue) 转换为大写 hex（不含 #）
+  // hexColor 变化时 URL 自然改变，浏览器会重新请求
+  const hexColor = oklchToHex(0.65, 0.19, themeHue)
+  const chartUrl = `https://ghchart.rshah.org/${hexColor}/AdingApkgg.svg`
+
+  return (
+    <motion.a
+      href="https://github.com/AdingApkgg"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block rounded-xl overflow-hidden border border-border/40 hover:border-primary/40 transition-all bg-white p-2"
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: 0.15 + index * 0.05 }}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+    >
+      <img
+        src={chartUrl}
+        alt="GitHub Contribution Chart"
+        className="w-full h-auto"
+        loading="lazy"
+      />
     </motion.a>
   )
 }
