@@ -146,7 +146,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
           // 第一个结果到来时请求 Bangumi 信息
           if (!bangumiRequested) {
             bangumiRequested = true
-            void fetchBangumiInfoList(query, 12).then((list) => {
+            void fetchBangumiInfoList(query, 20).then((list) => {
               set({ bangumiList: list })
             })
           }
