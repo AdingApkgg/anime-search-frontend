@@ -11,6 +11,8 @@ interface ModalProps {
   onClose: () => void
   children: React.ReactNode
   className?: string
+  /** 移动端全屏模式 */
+  fullscreenOnMobile?: boolean
 }
 
 const overlayVariants = {
@@ -51,7 +53,22 @@ const mobileContentVariants = {
   }
 }
 
-export function Modal({ open, onClose, children, className }: ModalProps) {
+const fullscreenMobileVariants = {
+  hidden: { 
+    opacity: 0,
+    scale: 0.95
+  },
+  visible: { 
+    opacity: 1,
+    scale: 1
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.95
+  }
+}
+
+export function Modal({ open, onClose, children, className, fullscreenOnMobile = false }: ModalProps) {
   const [mounted, setMounted] = React.useState(false)
   const [isMobile, setIsMobile] = React.useState(false)
 
@@ -102,15 +119,20 @@ export function Modal({ open, onClose, children, className }: ModalProps) {
           />
 
           {/* Content */}
-          <div className="fixed inset-0 flex items-center justify-center p-4 sm:p-6 pointer-events-none">
+          <div className={cn(
+            'fixed inset-0 flex items-center justify-center pointer-events-none',
+            fullscreenOnMobile ? 'max-sm:p-0 p-4 sm:p-6' : 'p-4 sm:p-6'
+          )}>
             <motion.div
               className={cn(
                 'relative w-full pointer-events-auto',
-                'glass-bg-strong rounded-2xl border border-border/50 shadow-2xl',
-                'max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:top-auto max-sm:rounded-b-none max-sm:rounded-t-3xl',
+                'glass-bg-strong border border-border/50 shadow-2xl',
+                fullscreenOnMobile
+                  ? 'max-sm:fixed max-sm:inset-0 max-sm:rounded-none max-sm:border-0 rounded-2xl'
+                  : 'rounded-2xl max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:top-auto max-sm:rounded-b-none max-sm:rounded-t-3xl',
                 className
               )}
-              variants={isMobile ? mobileContentVariants : contentVariants}
+              variants={isMobile ? (fullscreenOnMobile ? fullscreenMobileVariants : mobileContentVariants) : contentVariants}
               initial="hidden"
               animate="visible"
               exit="exit"

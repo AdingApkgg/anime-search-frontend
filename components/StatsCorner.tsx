@@ -15,7 +15,7 @@ export function StatsCorner() {
   const animationFrameRef = useRef<number | null>(null)
 
   const animateNumbers = useCallback((targetPv: number, targetUv: number) => {
-    const duration = 1500
+    const duration = 300
     const startTime = performance.now()
     const startPv = displayPv
     const startUv = displayUv

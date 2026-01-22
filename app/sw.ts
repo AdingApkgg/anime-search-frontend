@@ -82,8 +82,8 @@ const runtimeCaching = [
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
-  skipWaiting: false, // 由用户控制更新时机
-  clientsClaim: true,
+  skipWaiting: true, // 新版本立即激活，刷新页面后生效
+  clientsClaim: false, // 不立即接管，等用户刷新页面
   navigationPreload: true,
   runtimeCaching,
   fallbacks: {
@@ -96,13 +96,6 @@ const serwist = new Serwist({
       },
     ],
   },
-})
-
-// 监听来自客户端的消息
-self.addEventListener('message', (event) => {
-  if (event.data?.type === 'SKIP_WAITING') {
-    self.skipWaiting()
-  }
 })
 
 serwist.addEventListeners()

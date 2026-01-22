@@ -1,7 +1,8 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Volume2, Server, Image, ExternalLink, Palette, CircleDot, RotateCcw, X } from 'lucide-react'
+import { Volume2, Server, Image, Palette, CircleDot, RotateCcw, X, Settings } from 'lucide-react'
 import { playTransitionUp, playTransitionDown, playTap, setSoundEnabled } from '@/lib/sound'
 import { useUIStore, DEFAULT_BG_API } from '@/stores/ui'
 import { Modal, ModalContent } from '@/components/ui/modal'
@@ -62,11 +63,15 @@ export function SettingsModal() {
     <Modal
       open={showSettings}
       onClose={handleClose}
-      className="max-w-lg w-full max-h-[85vh] sm:max-h-[80vh] flex flex-col"
+      className="max-w-lg w-full max-h-[85vh] sm:max-h-[80vh] flex flex-col max-sm:max-h-full"
+      fullscreenOnMobile
     >
       {/* 自定义 Header */}
       <div className="flex items-center justify-between p-4 sm:p-6 border-b">
-        <div className="text-lg font-semibold">⚙️ 设置</div>
+        <div className="flex items-center gap-2 text-lg font-semibold">
+          <Settings size={20} className="text-primary" />
+          设置
+        </div>
         <div className="flex items-center gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -213,21 +218,9 @@ export function SettingsModal() {
 
         {/* 关于 */}
         <SettingsSection title="关于项目" index={3}>
-          <div className="grid gap-3 p-1">
-            <RepoCard
-              name="anime-search-frontend"
-              description="动漫聚合搜索前端"
-              language="TypeScript"
-              languageColor="#3178c6"
-              index={0}
-            />
-            <RepoCard
-              name="anime-search-api"
-              description="动漫聚合搜索 API"
-              language="Rust"
-              languageColor="#dea584"
-              index={1}
-            />
+          <div className="grid gap-3 p-3">
+            <RepoCard name="anime-search-frontend" index={0} />
+            <RepoCard name="anime-search-api" index={1} />
           </div>
         </SettingsSection>
       </ModalContent>
@@ -291,55 +284,65 @@ function SettingsItem({
   )
 }
 
-// GitHub 仓库卡片
+// 生成 SHA-256 hash
+async function sha256(message: string): Promise<string> {
+  const msgBuffer = new TextEncoder().encode(message)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+// 获取当前日期的 YYMMDD 格式
+function getDateString(): string {
+  const now = new Date()
+  const yy = String(now.getFullYear()).slice(-2)
+  const mm = String(now.getMonth() + 1).padStart(2, '0')
+  const dd = String(now.getDate()).padStart(2, '0')
+  return `${yy}${mm}${dd}` // 例如 "260122"
+}
+
+// GitHub 仓库卡片 - 使用 OpenGraph 图片
 function RepoCard({
   name,
-  description,
-  language,
-  languageColor,
   index = 0
 }: {
   name: string
-  description: string
-  language: string
-  languageColor: string
   index?: number
 }) {
+  const [hashTimestamp, setHashTimestamp] = useState<string>('')
+
+  useEffect(() => {
+    // 使用当前日期 YYMMDD 格式生成 hash
+    const dateStr = getDateString()
+    sha256(dateStr).then(setHashTimestamp)
+  }, [])
+
+  const imageUrl = hashTimestamp 
+    ? `https://opengraph.githubassets.com/${hashTimestamp}/AdingApkgg/${name}`
+    : ''
+
   return (
     <motion.a
       href={`https://github.com/AdingApkgg/${name}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-center gap-3 p-3.5 rounded-xl border border-border/40 hover:border-primary/40 transition-all glass-background hover:glass-bg"
+      className="group block rounded-xl overflow-hidden border border-border/40 hover:border-primary/40 transition-all"
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.15 + index * 0.05 }}
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
     >
-      <div className="size-10 rounded-xl bg-[#24292f]/90 dark:bg-[#f0f6fc]/10 flex items-center justify-center flex-shrink-0">
-        <svg width={20} height={20} viewBox="0 0 16 16" fill="currentColor" className="text-white dark:text-[#f0f6fc]">
-          <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z" />
-        </svg>
-      </div>
-      
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <span className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
-            {name}
-          </span>
-          <ExternalLink size={12} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-        </div>
-        <div className="text-sm text-muted-foreground truncate">{description}</div>
-      </div>
-      
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-shrink-0">
-        <span 
-          className="size-2.5 rounded-full" 
-          style={{ backgroundColor: languageColor }} 
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={`${name} repository`}
+          className="w-full h-auto object-cover"
+          loading="lazy"
         />
-        <span className="hidden sm:inline">{language}</span>
-      </div>
+      ) : (
+        <div className="w-full aspect-[2/1] bg-muted animate-pulse" />
+      )}
     </motion.a>
   )
 }

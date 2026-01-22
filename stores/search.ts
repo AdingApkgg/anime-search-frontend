@@ -110,13 +110,22 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       abortController: newController
     })
 
-    // 并行获取 Bangumi 信息
-    void fetchBangumiInfoList(query, 12).then((list) => {
-      set({ bangumiList: list })
-    })
+    // 15 秒超时：自动断开搜索
+    const timeoutId = setTimeout(() => {
+      const { isSearching } = get()
+      if (isSearching) {
+        console.log('搜索超时 (15s)，自动断开')
+        newController.abort()
+        set({ isSearching: false })
+      }
+    }, 15000)
+
+    // 标记是否已请求 Bangumi
+    let bangumiRequested = false
 
     const rulesArray = Array.from(selectedRules)
     if (rulesArray.length === 0) {
+      clearTimeout(timeoutId)
       set({ error: '请至少选择一个搜索源', isSearching: false })
       return
     }
@@ -133,20 +142,34 @@ export const useSearchStore = create<SearchState>((set, get) => ({
         onPlatformResult: (platform) => {
           const { platforms } = get()
           set({ platforms: [...platforms, platform] })
+          
+          // 第一个结果到来时请求 Bangumi 信息
+          if (!bangumiRequested) {
+            bangumiRequested = true
+            void fetchBangumiInfoList(query, 12).then((list) => {
+              set({ bangumiList: list })
+            })
+          }
         },
         onComplete: () => {
+          clearTimeout(timeoutId)
           set({ isSearching: false })
         },
         onError: (error) => {
+          clearTimeout(timeoutId)
           set({ error, isSearching: false })
         }
       })
     } catch (err) {
+      clearTimeout(timeoutId)
       if ((err as Error).name !== 'AbortError') {
         set({
           error: err instanceof Error ? err.message : '搜索失败',
           isSearching: false
         })
+      } else {
+        // AbortError 时也确保状态正确
+        set({ isSearching: false })
       }
     }
   },

@@ -19,7 +19,8 @@ export function SearchHeader() {
     platforms, bangumiList
   } = useSearchStore()
 
-  const hasResults = platforms.length > 0 || bangumiList.length > 0 || isSearching
+  // 只有当有实际结果时才移动搜索框
+  const hasResults = platforms.length > 0 || bangumiList.length > 0
 
   const [showRules, setShowRules] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)

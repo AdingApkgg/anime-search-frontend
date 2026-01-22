@@ -73,7 +73,10 @@ export function FloatingButtons() {
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           >
             <div className="flex items-center justify-between px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              <span>站点导航</span>
+              <span className="flex items-center gap-1.5">
+                <Navigation size={14} className="text-primary" />
+                站点导航
+              </span>
               <motion.button
                 className="size-6 flex items-center justify-center rounded-md hover:bg-muted"
                 onClick={() => { playTap(); closeNavPanel() }}
