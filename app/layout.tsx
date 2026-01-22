@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 import { SerwistProvider } from './serwist'
+import { UpdateToast } from '@/components/UpdateToast'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen antialiased">
         <SerwistProvider swUrl="/sw.js">
           {children}
+          <UpdateToast />
         </SerwistProvider>
 
         {/* 不蒜子统计 */}
