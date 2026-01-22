@@ -56,7 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen antialiased">
-        <SerwistProvider swUrl="/sw.js" disable={process.env.NODE_ENV === 'development'}>
+        <SerwistProvider>
           {children}
           <UpdateToast />
         </SerwistProvider>

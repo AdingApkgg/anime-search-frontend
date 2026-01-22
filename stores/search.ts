@@ -21,6 +21,9 @@ interface SearchState {
 
   // 搜索控制器
   abortController: AbortController | null
+  
+  // 超时计时器 ID
+  searchTimeoutId: ReturnType<typeof setTimeout> | null
 
   // Actions
   setQuery: (query: string) => void
@@ -46,6 +49,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   rulesError: '',
   bangumiList: [],
   abortController: null,
+  searchTimeoutId: null,
 
   // Actions
   setQuery: (query) => { set({ query }) },
@@ -89,9 +93,14 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   },
 
   search: async () => {
-    const { query, selectedRules, abortController: oldController } = get()
+    const { query, selectedRules, abortController: oldController, searchTimeoutId: oldTimeoutId } = get()
 
     if (!query.trim()) return
+
+    // 清除之前的超时计时器
+    if (oldTimeoutId) {
+      clearTimeout(oldTimeoutId)
+    }
 
     // 取消之前的搜索
     if (oldController) {
@@ -100,6 +109,18 @@ export const useSearchStore = create<SearchState>((set, get) => ({
 
     const newController = new AbortController()
 
+    // 15 秒超时：自动断开搜索
+    // 使用当前 controller 引用确保只影响本次搜索
+    const timeoutId = setTimeout(() => {
+      // 检查是否仍是本次搜索的 controller
+      const { abortController } = get()
+      if (abortController === newController) {
+        console.warn('搜索超时 (15s)，自动断开')
+        newController.abort()
+        set({ isSearching: false, searchTimeoutId: null })
+      }
+    }, 15000)
+
     // 重置状态
     set({
       platforms: [],
@@ -107,18 +128,9 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       error: '',
       progress: { current: 0, total: 0 },
       bangumiList: [],
-      abortController: newController
+      abortController: newController,
+      searchTimeoutId: timeoutId
     })
-
-    // 15 秒超时：自动断开搜索
-    const timeoutId = setTimeout(() => {
-      const { isSearching } = get()
-      if (isSearching) {
-        console.warn('搜索超时 (15s)，自动断开')
-        newController.abort()
-        set({ isSearching: false })
-      }
-    }, 15000)
 
     // 标记是否已请求 Bangumi
     let bangumiRequested = false
@@ -126,7 +138,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     const rulesArray = Array.from(selectedRules)
     if (rulesArray.length === 0) {
       clearTimeout(timeoutId)
-      set({ error: '请至少选择一个搜索源', isSearching: false })
+      set({ error: '请至少选择一个搜索源', isSearching: false, searchTimeoutId: null })
       return
     }
 
@@ -153,11 +165,11 @@ export const useSearchStore = create<SearchState>((set, get) => ({
         },
         onComplete: () => {
           clearTimeout(timeoutId)
-          set({ isSearching: false })
+          set({ isSearching: false, searchTimeoutId: null })
         },
         onError: (error) => {
           clearTimeout(timeoutId)
-          set({ error, isSearching: false })
+          set({ error, isSearching: false, searchTimeoutId: null })
         }
       })
     } catch (err) {
@@ -165,25 +177,32 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       if ((err as Error).name !== 'AbortError') {
         set({
           error: err instanceof Error ? err.message : '搜索失败',
-          isSearching: false
+          isSearching: false,
+          searchTimeoutId: null
         })
       } else {
         // AbortError 时也确保状态正确
-        set({ isSearching: false })
+        set({ isSearching: false, searchTimeoutId: null })
       }
     }
   },
 
   cancelSearch: () => {
-    const { abortController } = get()
+    const { abortController, searchTimeoutId } = get()
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId)
+    }
     if (abortController) {
       abortController.abort()
     }
-    set({ isSearching: false, abortController: null })
+    set({ isSearching: false, abortController: null, searchTimeoutId: null })
   },
 
   reset: () => {
-    const { abortController } = get()
+    const { abortController, searchTimeoutId } = get()
+    if (searchTimeoutId) {
+      clearTimeout(searchTimeoutId)
+    }
     if (abortController) {
       abortController.abort()
     }
@@ -194,7 +213,8 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       progress: { current: 0, total: 0 },
       bangumiList: [],
       isSearching: false,
-      abortController: null
+      abortController: null,
+      searchTimeoutId: null
     })
   }
 }))
