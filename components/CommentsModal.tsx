@@ -20,7 +20,7 @@ export function CommentsModal() {
           const isDark = document.documentElement.classList.contains('dark')
           artalkRef.current = Artalk.init({
             el: containerRef.current,
-            pageKey: 'https://as.saop.cc/',
+            pageKey: '/',
             server: 'https://artalk.saop.cc',
             site: '动漫聚搜',
             darkMode: isDark
