@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>动漫聚搜 API 测试</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .search-box {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      #keyword {
+        flex: 1;
+        padding: 8px;
+        font-size: 14px;
+      }
+      .rules-section {
+        margin-bottom: 16px;
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 4px;
+      }
+      .rules-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+      .rules-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        overflow-y: auto;
+      }
+      .rule-tag {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .rule-tag.selected {
+        border-color: #0066cc;
+        background: #e6f0ff;
+      }
+      .progress {
+        height: 4px;
+        background: #eee;
+        margin-bottom: 16px;
+        display: none;
+      }
+      .progress-bar {
+        height: 100%;
+        background: #0066cc;
+        width: 0%;
+        transition: width 0.2s;
+      }
+      .platform {
+        margin-bottom: 12px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .platform-name {
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+      .item {
+        padding: 6px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .item:last-child {
+        border-bottom: none;
+      }
+      .item a {
+        color: #0066cc;
+        text-decoration: none;
+      }
+      .item a:hover {
+        text-decoration: underline;
+      }
+      .episodes-panel {
+        display: none;
+        margin-top: 8px;
+        padding: 8px;
+        background: #f9f9f9;
+      }
+      .episodes-panel.show {
+        display: block;
+      }
+      .episodes-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .episode-btn {
+        padding: 2px 6px;
+        font-size: 11px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 2px;
+        color: #333;
+        text-decoration: none;
+      }
+      .error {
+        color: red;
+      }
+      .empty {
+        color: #666;
+        text-align: center;
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎬 动漫聚搜 API 测试</h1>
+
+    <div class="search-box">
+      <input type="text" id="keyword" placeholder="输入动漫名称..." autofocus />
+      <button id="searchBtn" onclick="search()">搜索</button>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-header">
+        <span>搜索源 (<span id="selectedCount">0</span> 已选)</span>
+        <div>
+          <button onclick="selectAll()">全选</button>
+          <button onclick="selectNone()">清除</button>
+        </div>
+      </div>
+      <div class="rules-grid" id="rulesGrid">加载中...</div>
+    </div>
+
+    <div class="progress" id="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const input = $("keyword");
+      const btn = $("searchBtn");
+      const progress = $("progress");
+      const progressBar = $("progressBar");
+      const results = $("results");
+      const rulesGrid = $("rulesGrid");
+      const selectedCount = $("selectedCount");
+
+      const escapeHtml = (str) =>
+        String(str || "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c])
+        );
+
+      let allRules = [];
+
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") search();
+      });
+
+      async function loadRules() {
+        try {
+          const res = await fetch("/rules");
+          allRules = await res.json();
+          renderRules();
+          selectAll();
+        } catch (e) {
+          rulesGrid.innerHTML = '<span class="error">加载规则失败</span>';
+        }
+      }
+
+      function renderRules() {
+        rulesGrid.innerHTML = allRules
+          .map(
+            (rule) => `
+        <label class="rule-tag">
+          <input type="checkbox" value="${escapeHtml(rule.name)}">
+          ${escapeHtml(rule.name)}
+        </label>
+      `
+          )
+          .join("");
+
+        rulesGrid.querySelectorAll("input").forEach((cb) => {
+          cb.addEventListener("change", () => {
+            cb.closest(".rule-tag").classList.toggle("selected", cb.checked);
+            updateCount();
+          });
+        });
+      }
+
+      function updateCount() {
+        selectedCount.textContent =
+          rulesGrid.querySelectorAll("input:checked").length;
+      }
+
+      function selectAll() {
+        rulesGrid.querySelectorAll(".rule-tag").forEach((tag) => {
+          tag.querySelector("input").checked = true;
+          tag.classList.add("selected");
+        });
+        updateCount();
+      }
+
+      function selectNone() {
+        rulesGrid.querySelectorAll(".rule-tag").forEach((tag) => {
+          tag.querySelector("input").checked = false;
+          tag.classList.remove("selected");
+        });
+        updateCount();
+      }
+
+      function getSelectedRules() {
+        return Array.from(rulesGrid.querySelectorAll("input:checked")).map(
+          (cb) => cb.value
+        );
+      }
+
+      async function search() {
+        const keyword = input.value.trim();
+        const selectedRules = getSelectedRules();
+
+        if (!keyword) return alert("请输入动漫名称");
+        if (selectedRules.length === 0) return alert("请至少选择一个搜索源");
+
+        btn.disabled = true;
+        btn.textContent = "搜索中...";
+        results.innerHTML = "";
+        progress.style.display = "block";
+        progressBar.style.width = "0%";
+
+        try {
+          const formData = new FormData();
+          formData.append("anime", keyword);
+          formData.append("rules", selectedRules.join(","));
+
+          const response = await fetch("/api", {
+            method: "POST",
+            body: formData,
+          });
+          if (!response.ok)
+            throw new Error((await response.json()).error || "请求失败");
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = "";
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+
+            for (const line of lines) {
+              if (!line.trim()) continue;
+              try {
+                const data = JSON.parse(line);
+                if (data.progress)
+                  progressBar.style.width =
+                    (data.progress.completed / data.progress.total) * 100 + "%";
+                if (data.result) renderPlatform(data.result);
+                if (data.done) {
+                  progress.style.display = "none";
+                  if (!results.children.length)
+                    results.innerHTML = '<div class="empty">未找到结果</div>';
+                }
+              } catch {}
+            }
+          }
+        } catch (e) {
+          results.innerHTML = `<div class="error">搜索失败: ${escapeHtml(
+            e.message
+          )}</div>`;
+          progress.style.display = "none";
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "搜索";
+        }
+      }
+
+      function renderPlatform(result) {
+        if (result.error && !result.items?.length) return;
+        const div = document.createElement("div");
+        div.className = "platform";
+        div.innerHTML = `
+        <div class="platform-name">${escapeHtml(result.name)} (${
+          result.items?.length || 0
+        })</div>
+        ${(result.items || [])
+          .map((item) => {
+            const hasEps = item.episodes?.length > 0;
+            return `<div class="item">
+            <a href="${escapeHtml(item.url)}" target="_blank">${escapeHtml(
+              item.name
+            )}</a>
+            ${
+              hasEps
+                ? `<button onclick="this.nextElementSibling.classList.toggle('show')">集数</button>
+            <div class="episodes-panel">${item.episodes
+              .map(
+                (road) => `
+              ${
+                road.name
+                  ? `<div><strong>${escapeHtml(road.name)}</strong></div>`
+                  : ""
+              }
+              <div class="episodes-grid">${road.episodes
+                .map(
+                  (ep) =>
+                    `<a class="episode-btn" href="${escapeHtml(
+                      ep.url
+                    )}" target="_blank">${escapeHtml(ep.name)}</a>`
+                )
+                .join("")}</div>
+            `
+              )
+              .join("")}</div>`
+                : ""
+            }
+          </div>`;
+          })
+          .join("")}`;
+        results.appendChild(div);
+      }
+
+      loadRules();
+    </script>
+  </body>
+</html>
