@@ -65,7 +65,7 @@ impl Config {
             }),
 
             proxy_prefix: env::var("PROXY_PREFIX")
-                .unwrap_or_else(|_| "https://rp.30hb.cn/?target=".to_string()),
+                .unwrap_or_else(|_| "https://rp.saop.cc/?target=".to_string()),
 
             github_proxy: env::var("GITHUB_PROXY")
                 .unwrap_or_else(|_| "https://gh-proxy.com/".to_string()),
