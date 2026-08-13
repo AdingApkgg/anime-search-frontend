@@ -74,7 +74,7 @@ impl Config {
                 .unwrap_or_else(|_| "https://api.bgm.tv".to_string()),
 
             bangumi_user_agent: env::var("BANGUMI_USER_AGENT")
-                .unwrap_or_else(|_| "kirito/anime-search (https://github.com/AdingApkgg/anime-search-api)".to_string()),
+                .unwrap_or_else(|_| "kirito/anime-search (https://github.com/AdingApkgg/sa)".to_string()),
 
             rules_repo: env::var("RULES_REPO")
                 .unwrap_or_else(|_| "Predidit/KazumiRules".to_string()),

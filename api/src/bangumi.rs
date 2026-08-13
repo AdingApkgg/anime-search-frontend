@@ -13,7 +13,7 @@ use serde_json::Value;
 use tracing::warn;
 
 const BANGUMI_API: &str = "https://api.bgm.tv";
-const USER_AGENT: &str = "kirito/anime-search (https://github.com/AdingApkgg/anime-search-api)";
+const USER_AGENT: &str = "kirito/anime-search (https://github.com/AdingApkgg/sa)";
 
 // Bangumi 应用凭证 (https://bgm.tv/dev/app)
 #[allow(dead_code)]

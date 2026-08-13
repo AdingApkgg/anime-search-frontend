@@ -218,8 +218,7 @@ export function SettingsModal() {
         <SettingsSection title="关于项目" index={3}>
           <div className="grid gap-3 p-3">
             <ContributionChart themeHue={themeHue} index={0} />
-            <RepoCard name="anime-search-frontend" index={1} />
-            <RepoCard name="anime-search-api" index={2} />
+            <RepoCard name="sa" index={1} />
           </div>
         </SettingsSection>
       </ModalContent>
