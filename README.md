@@ -36,8 +36,9 @@ pnpm build         # 生产构建（tsc + vite + serwist）→ dist/
 pnpm preview       # 预览生产构建
 ```
 
-前端默认连接线上 API（`.env` 中的 `VITE_API_BASE_URL`）；本地联调时改为
-`http://localhost:3000` 或在页面「设置」中自定义 API 地址。
+前端默认连接线上 API（`.env` 中的 `VITE_API_BASE_URL`）。本地联调时**不要改动已跟踪的
+`.env`**，在 `frontend/.env.local`（已被 git 忽略）中写入
+`VITE_API_BASE_URL=http://localhost:3000`，或直接在页面「设置」中自定义 API 地址。
 
 ## 部署
 

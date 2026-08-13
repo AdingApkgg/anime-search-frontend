@@ -25,7 +25,6 @@ export default defineConfig({
             '@radix-ui/react-checkbox',
             '@radix-ui/react-collapsible',
             '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
             '@radix-ui/react-switch',
             '@radix-ui/react-tooltip'
           ],

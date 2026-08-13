@@ -31,7 +31,7 @@
 ### 编译运行
 
 ```bash
-cd anime-search-api
+cd api
 
 # 开发运行
 cargo run
@@ -45,7 +45,7 @@ cargo build --release
 
 ### 预编译二进制
 
-从 [Releases](https://github.com/AdingApkgg/anime-search-api/releases) 下载预编译版本：
+从本仓库 Releases 下载预编译版本（推送 `api-v*` 标签自动构建发布）：
 
 | 平台 | 文件 |
 |------|------|
@@ -184,7 +184,7 @@ curl http://localhost:3000/update
 ## 📁 项目结构
 
 ```
-anime-search-api/
+api/
 ├── Cargo.toml
 ├── LICENSE
 ├── README.md

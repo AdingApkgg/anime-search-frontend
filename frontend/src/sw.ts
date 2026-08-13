@@ -3,7 +3,7 @@
 /// <reference lib="webworker" />
 
 import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist'
-import { Serwist, NetworkFirst, ExpirationPlugin } from 'serwist'
+import { Serwist, NetworkFirst, ExpirationPlugin, NavigationRoute } from 'serwist'
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -40,16 +40,9 @@ const serwist = new Serwist({
   clientsClaim: false, // 不立即接管，等用户刷新页面
   navigationPreload: true,
   runtimeCaching,
-  fallbacks: {
-    entries: [
-      {
-        url: '/index.html',
-        matcher({ request }) {
-          return request.destination === 'document'
-        },
-      },
-    ],
-  },
 })
+
+// SPA 导航回退：所有页面导航都由预缓存的 index.html 响应（离线可用）
+serwist.registerRoute(new NavigationRoute(serwist.createHandlerBoundToUrl('/index.html')))
 
 serwist.addEventListeners()
