@@ -16,7 +16,7 @@
 | UI 组件 | Radix UI | - |
 | 音效 | Web Audio API | - |
 | 评论 | Artalk | 2.9 |
-| PWA | vite-plugin-pwa | 1.2 |
+| PWA | Serwist | 9 |
 
 ## 功能特性
 
@@ -53,37 +53,41 @@ src/
 │   ├── search.ts     # SSE 流式搜索
 │   └── bangumi.ts    # Bangumi API
 ├── components/       # React 组件
-│   ├── App.tsx       # 根组件
 │   ├── SearchHeader.tsx      # 搜索框 + 选项
 │   ├── SearchResults.tsx     # 搜索结果列表
 │   ├── BangumiCard.tsx       # Bangumi 信息卡片
-│   ├── TopToolbar.tsx        # 顶部工具栏
 │   ├── FloatingButtons.tsx   # 浮动按钮
 │   ├── StatsCorner.tsx       # 统计角标
 │   ├── SettingsModal.tsx     # 设置面板
 │   ├── CommentsModal.tsx     # 评论面板
-│   ├── KeyboardHelpModal.tsx # 快捷键帮助
-│   └── Background.tsx        # 背景装饰
-├── hooks/            # 自定义 Hooks
-│   └── useKeyboardShortcuts.ts
+│   ├── UpdateToast.tsx       # SW 更新处理
+│   ├── Background.tsx        # 背景装饰
+│   └── ui/                   # 基础 UI 组件 (shadcn 风格)
 ├── lib/              # 工具库
 │   ├── utils.ts      # 通用工具函数
-│   ├── sound.ts      # Web Audio API 音效
-│   └── theme.ts      # 主题管理
-├── store/            # Zustand 状态管理
+│   └── sound.ts      # Web Audio API 音效
+├── stores/           # Zustand 状态管理
 │   ├── search.ts     # 搜索状态
 │   └── ui.ts         # UI 状态
-├── index.css         # 全局样式 (Tailwind)
+├── App.tsx           # 根组件
 ├── main.tsx          # 入口文件
+├── serwist.tsx       # Service Worker 注册 (SerwistProvider)
+├── sw.ts             # Service Worker 源码 (Serwist)
+├── index.css         # 全局样式 (Tailwind)
 └── vite-env.d.ts     # Vite 类型声明
 ```
 
 ## 环境变量
 
 ```bash
-# API 端点
+# API 端点 (.env / .env.development)
 VITE_API_BASE_URL=https://anime-search.saop.cc
-
-# Bangumi API
-VITE_BANGUMI_API_URL=https://anime-search.saop.cc/bangumi
 ```
+
+## 构建说明
+
+`pnpm build` 依次执行：
+
+1. `tsc -b` - 类型检查（app / sw / node 三个项目引用）
+2. `vite build` - 打包到 `dist/`
+3. `serwist build` - 依据 `serwist.config.js` 注入预缓存清单并生成 `dist/sw.js`

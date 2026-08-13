@@ -72,14 +72,17 @@ jobs:
 
       - name: Build (native)
         if: ${{ !matrix.cross }}
+        working-directory: api
         run: cargo build --release --target ${{ matrix.target }}
 
       - name: Build (cross)
         if: matrix.cross
+        working-directory: api
         run: cross build --release --target ${{ matrix.target }}
 
       - name: Package (Unix)
         if: runner.os != 'Windows'
+        working-directory: api
         run: |
           cd target/${{ matrix.target }}/release
           tar -czvf ../../../${{ env.BINARY_NAME }}-${{ matrix.target }}.tar.gz ${{ env.BINARY_NAME }}
@@ -87,6 +90,7 @@ jobs:
       - name: Package (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
+        working-directory: api
         run: |
           cd target/${{ matrix.target }}/release
           Compress-Archive -Path ${{ env.BINARY_NAME }}.exe -DestinationPath ../../../${{ env.BINARY_NAME }}-${{ matrix.target }}.zip
@@ -96,8 +100,8 @@ jobs:
         with:
           name: ${{ env.BINARY_NAME }}-${{ matrix.target }}
           path: |
-            ${{ env.BINARY_NAME }}-${{ matrix.target }}.tar.gz
-            ${{ env.BINARY_NAME }}-${{ matrix.target }}.zip
+            api/${{ env.BINARY_NAME }}-${{ matrix.target }}.tar.gz
+            api/${{ env.BINARY_NAME }}-${{ matrix.target }}.zip
 
   release:
     name: Create Release

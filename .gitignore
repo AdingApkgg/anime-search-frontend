@@ -1,25 +1,19 @@
 # Dependencies
 node_modules/
 
-# Next.js
-.next/
-out/
-
-# Serwist
-public/sw.js.map
-
 # Build
 dist/
+target/
 
 # Environment
-.env
-.env.*
-!.env.example
+.env.local
+*.local
 
 # Logs
 *.log
 npm-debug.log*
 pnpm-debug.log*
+.pnpm-debug.log
 
 # Editor
 .vscode/
@@ -29,6 +23,7 @@ pnpm-debug.log*
 *.swp
 *.swo
 .history/
+.claude/
 
 # OS
 .DS_Store
@@ -36,6 +31,3 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
-
-# Debug
-.pnpm-debug.log
