@@ -30,8 +30,8 @@ importers:
         specifier: ^1.2.8
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       artalk:
-        specifier: ^2.9.1
-        version: 2.9.1(marked@14.1.4)
+        specifier: ^2.10.0
+        version: 2.10.0(marked@14.1.4)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1661,10 +1661,10 @@ packages:
     resolution: {integrity: sha512-BNoCY6SXXPQ7gF2opIP4GBE+Xw7U+pHMYKuzjgCN3GwiaIR09UUeKfheyIry77QtrCBlC0KK0q5/TER/tYh3PQ==}
     engines: {node: '>= 0.4'}
 
-  artalk@2.9.1:
-    resolution: {integrity: sha512-IFo9XqWDalsHy8BsmMA5SSB9bozBa/sBhTm/+O5KwA6DnC95lFKv7C6ScMx/Xa4ue5qSQ7VV5vxRgCh/raohkQ==}
+  artalk@2.10.0:
+    resolution: {integrity: sha512-vDMx/DnhV/8zGJJRgvnNEIIGFKRD5LEuEKubKYLF4Q0nMe3aKIOn+Hj/WsyRtAogfeGghrQXKoieYXRfwJyliw==}
     peerDependencies:
-      marked: ^14.1.0
+      marked: ^18.0.7
 
   async-function@1.0.0:
     resolution: {integrity: sha512-hsU18Ae8CDTR6Kgu9DYf0EbCr/a5iGL0rytQDobUcdpYOKokk8LEjVphnXkDkgpi0wYVsqrXuP0bZxJaTqdgoA==}
@@ -4725,7 +4725,7 @@ snapshots:
       get-intrinsic: 1.3.0
       is-array-buffer: 3.0.5
 
-  artalk@2.9.1(marked@14.1.4):
+  artalk@2.10.0(marked@14.1.4):
     dependencies:
       marked: 14.1.4
 
