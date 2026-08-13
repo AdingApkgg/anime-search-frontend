@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ExternalLink, AlertTriangle, ChevronDown, Play, Layers } from 'lucide-react'

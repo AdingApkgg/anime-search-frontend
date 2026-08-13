@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Volume2, Server, Image, Palette, CircleDot, RotateCcw, X, Settings } from 'lucide-react'

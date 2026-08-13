@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect } from 'react'
 import { Background } from '@/components/Background'
 import { SearchHeader } from '@/components/SearchHeader'
@@ -9,7 +7,7 @@ import { CommentsModal } from '@/components/CommentsModal'
 import { SettingsModal } from '@/components/SettingsModal'
 import { useUIStore } from '@/stores/ui'
 
-export default function HomePage() {
+export default function App() {
   const { initSettings } = useUIStore()
 
   useEffect(() => {

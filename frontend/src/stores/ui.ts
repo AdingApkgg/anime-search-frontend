@@ -5,7 +5,7 @@ import { setSoundEnabled as setSoundModule } from '@/lib/sound'
 const isBrowser = typeof window !== 'undefined'
 
 // ============ API 设置 ============
-const DEFAULT_API_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://anime-search.saop.cc'
+const DEFAULT_API_URL = import.meta.env.VITE_API_BASE_URL ?? 'https://anime-search.saop.cc'
 const API_URL_STORAGE_KEY = 'anime-search-api-url'
 
 function getSavedApiUrl(): string {

@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useRef } from 'react'
 import Artalk from 'artalk'
 import 'artalk/dist/Artalk.css'

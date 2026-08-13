@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState, createContext, useContext, useCallback } from 'react'
 
 interface SerwistContextType {
@@ -30,8 +28,13 @@ export function SerwistProvider({ children }: SerwistProviderProps) {
   const [hasUpdate, setHasUpdate] = useState(false)
 
   useEffect(() => {
+    // 开发模式没有 sw.js（由 serwist build 在生产构建时生成），跳过注册
+    if (!import.meta.env.PROD) {
+      return
+    }
+
     // 浏览器不支持 Service Worker 时跳过
-    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+    if (!('serviceWorker' in navigator)) {
       return
     }
 

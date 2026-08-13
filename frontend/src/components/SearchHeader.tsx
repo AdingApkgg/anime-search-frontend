@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useRef, useEffect, type FormEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Loader2, Check, X, Settings2, CornerDownLeft } from 'lucide-react'
