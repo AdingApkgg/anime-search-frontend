@@ -1,6 +1,6 @@
 [package]
 name = "anime-search-api"
-version = "0.1.0"
+version = "0.1.4"
 edition = "2021"
 description = "在线动漫聚合搜索后端 - Rust + Axum"
 license = "MIT"
