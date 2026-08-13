@@ -77,6 +77,12 @@ async fn main() {
     info!("🚀 动漫聚搜 API 启动在 http://{}", addr);
     info!("📚 已加载 {} 个规则", get_builtin_rules().len());
 
+    // 提前构建 HTTP 客户端：PROXY_URL 配置错误时在启动阶段直接失败
+    let _ = &*http_client::HTTP_CLIENT;
+    if let Some(proxy) = &CONFIG.proxy_url {
+        info!("🌐 出站请求经由代理: {}", proxy);
+    }
+
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }

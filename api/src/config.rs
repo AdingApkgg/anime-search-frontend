@@ -25,6 +25,9 @@ pub struct Config {
     /// 反代前缀 (用于网络问题时重试)
     pub proxy_prefix: String,
 
+    /// 出站网络代理 (http:// / https:// / socks5://，作用于所有外发请求)
+    pub proxy_url: Option<String>,
+
     /// GitHub 代理前缀 (用于 GitHub 资源加速)
     pub github_proxy: String,
 
@@ -66,6 +69,11 @@ impl Config {
 
             proxy_prefix: env::var("PROXY_PREFIX")
                 .unwrap_or_else(|_| "https://rp.saop.cc/?target=".to_string()),
+
+            proxy_url: env::var("PROXY_URL")
+                .ok()
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty()),
 
             github_proxy: env::var("GITHUB_PROXY")
                 .unwrap_or_else(|_| "https://gh-proxy.com/".to_string()),

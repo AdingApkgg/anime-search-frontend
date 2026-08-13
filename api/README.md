@@ -213,6 +213,8 @@ api/
 | `PORT` | 3000 | 服务端口 |
 | `RUST_LOG` | info | 日志级别 |
 | `AUTO_UPDATE` | 0 | 启动时自动更新规则 (1=启用) |
+| `PROXY_URL` | - | 出站网络代理，作用于所有外发请求 (`http://` / `https://` / `socks5://`) |
+| `PROXY_PREFIX` | `https://rp.saop.cc/?target=` | 反代前缀 (请求失败时重试用) |
 | `BANGUMI_ACCESS_TOKEN` | - | Bangumi API 默认 access token |
 
 ## 🔄 Nginx 反向代理

@@ -7,14 +7,21 @@ use thiserror::Error;
 
 /// 创建 HTTP 客户端
 fn build_client(timeout_secs: u64) -> Client {
-    Client::builder()
+    let mut builder = Client::builder()
         .timeout(Duration::from_secs(timeout_secs))
         .user_agent(&CONFIG.user_agent)
         .gzip(true)
         .brotli(true)
-        .danger_accept_invalid_certs(true) // 某些站点证书有问题
-        .build()
-        .expect("Failed to create HTTP client")
+        .danger_accept_invalid_certs(true); // 某些站点证书有问题
+
+    // 出站网络代理 (PROXY_URL)
+    if let Some(proxy) = &CONFIG.proxy_url {
+        let proxy = reqwest::Proxy::all(proxy)
+            .unwrap_or_else(|e| panic!("PROXY_URL 无效 ({proxy}): {e}"));
+        builder = builder.proxy(proxy);
+    }
+
+    builder.build().expect("Failed to create HTTP client")
 }
 
 /// 全局 HTTP 客户端

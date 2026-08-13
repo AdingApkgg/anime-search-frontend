@@ -15,7 +15,7 @@ tower = "0.5"
 tower-http = { version = "0.6", features = ["cors", "trace"] }
 
 # HTTP 客户端
-reqwest = { version = "0.13", features = ["json", "gzip", "brotli", "form"] }
+reqwest = { version = "0.13", features = ["json", "gzip", "brotli", "form", "socks"] }
 
 # 序列化
 serde = { version = "1", features = ["derive"] }
