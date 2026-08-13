@@ -30,11 +30,17 @@ fn build_client(timeout_secs: u64, use_proxy: bool) -> Client {
 pub static HTTP_CLIENT: Lazy<Client> =
     Lazy::new(|| build_client(CONFIG.timeout_seconds, CONFIG.proxy_mode == "all"));
 
-/// 用于重试的 HTTP 客户端 (更长超时；配置了 PROXY_URL 时始终走网络代理)
-static RETRY_CLIENT: Lazy<Client> = Lazy::new(|| build_client(CONFIG.retry_timeout_seconds, true));
+/// 重试客户端 (更长超时)：
+/// mode=all 时走网络代理 (维持全代理语义)，mode=retry 时直连 (用于反代前缀路径)
+static RETRY_CLIENT: Lazy<Client> =
+    Lazy::new(|| build_client(CONFIG.retry_timeout_seconds, CONFIG.proxy_mode == "all"));
 
-/// 重试时是否直接用网络代理请求原始 URL (而非拼接 PROXY_PREFIX 反代前缀)
-fn retry_via_network_proxy() -> bool {
+/// 网络代理重试客户端 (更长超时，始终走 PROXY_URL)
+static RETRY_CLIENT_PROXY: Lazy<Client> =
+    Lazy::new(|| build_client(CONFIG.retry_timeout_seconds, true));
+
+/// retry 模式下是否额外用网络代理竞速重试
+fn race_network_proxy_retry() -> bool {
     CONFIG.proxy_url.is_some() && CONFIG.proxy_mode == "retry"
 }
 
@@ -103,13 +109,20 @@ pub async fn get(url: &str, referer: Option<&str>) -> Result<Response, HttpClien
             };
 
             if should_use_proxy {
-                if retry_via_network_proxy() {
-                    tracing::debug!("使用网络代理重试: {}", url);
-                    get_internal(&RETRY_CLIENT, url, referer).await
+                let prefix_url = format!("{}{}", CONFIG.proxy_prefix, url);
+                if race_network_proxy_retry() {
+                    // 反代前缀与网络代理并发竞速，取先成功者
+                    tracing::debug!("反代/网络代理竞速重试: {}", url);
+                    futures::future::select_ok([
+                        Box::pin(get_internal(&RETRY_CLIENT, &prefix_url, referer))
+                            as std::pin::Pin<Box<dyn std::future::Future<Output = _> + Send>>,
+                        Box::pin(get_internal(&RETRY_CLIENT_PROXY, url, referer)),
+                    ])
+                    .await
+                    .map(|(resp, _)| resp)
                 } else {
-                    let proxy_url = format!("{}{}", CONFIG.proxy_prefix, url);
                     tracing::debug!("使用反代重试: {}", url);
-                    get_internal(&RETRY_CLIENT, &proxy_url, referer).await
+                    get_internal(&RETRY_CLIENT, &prefix_url, referer).await
                 }
             } else {
                 Err(e)
@@ -192,13 +205,19 @@ pub async fn post_form_text(
             };
 
             if should_use_proxy {
-                let resp = if retry_via_network_proxy() {
-                    tracing::debug!("使用网络代理重试 POST: {}", url);
-                    post_form_internal(&RETRY_CLIENT, url, form, referer).await?
+                let prefix_url = format!("{}{}", CONFIG.proxy_prefix, url);
+                let resp = if race_network_proxy_retry() {
+                    tracing::debug!("反代/网络代理竞速重试 POST: {}", url);
+                    futures::future::select_ok([
+                        Box::pin(post_form_internal(&RETRY_CLIENT, &prefix_url, form, referer))
+                            as std::pin::Pin<Box<dyn std::future::Future<Output = _> + Send>>,
+                        Box::pin(post_form_internal(&RETRY_CLIENT_PROXY, url, form, referer)),
+                    ])
+                    .await
+                    .map(|(resp, _)| resp)?
                 } else {
-                    let proxy_url = format!("{}{}", CONFIG.proxy_prefix, url);
                     tracing::debug!("使用反代重试 POST: {}", url);
-                    post_form_internal(&RETRY_CLIENT, &proxy_url, form, referer).await?
+                    post_form_internal(&RETRY_CLIENT, &prefix_url, form, referer).await?
                 };
                 resp.text()
                     .await

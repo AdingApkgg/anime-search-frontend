@@ -214,7 +214,7 @@ api/
 | `RUST_LOG` | info | 日志级别 |
 | `AUTO_UPDATE` | 0 | 启动时自动更新规则 (1=启用) |
 | `PROXY_URL` | - | 出站网络代理 (`http://` / `https://` / `socks5://`) |
-| `PROXY_MODE` | `retry` | `retry`=失败重试才走代理 (直连优先)，`all`=全部请求走代理 |
+| `PROXY_MODE` | `retry` | `retry`=直连优先，失败时反代/网络代理竞速重试；`all`=全部请求走代理 |
 | `PROXY_PREFIX` | `https://rp.saop.cc/?target=` | 反代前缀 (请求失败时重试用) |
 | `BANGUMI_ACCESS_TOKEN` | - | Bangumi API 默认 access token |
 
