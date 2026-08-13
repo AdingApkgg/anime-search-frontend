@@ -6,7 +6,7 @@ use std::time::Duration;
 use thiserror::Error;
 
 /// 创建 HTTP 客户端
-fn build_client(timeout_secs: u64) -> Client {
+fn build_client(timeout_secs: u64, use_proxy: bool) -> Client {
     let mut builder = Client::builder()
         .timeout(Duration::from_secs(timeout_secs))
         .user_agent(&CONFIG.user_agent)
@@ -15,20 +15,28 @@ fn build_client(timeout_secs: u64) -> Client {
         .danger_accept_invalid_certs(true); // 某些站点证书有问题
 
     // 出站网络代理 (PROXY_URL)
-    if let Some(proxy) = &CONFIG.proxy_url {
-        let proxy = reqwest::Proxy::all(proxy)
-            .unwrap_or_else(|e| panic!("PROXY_URL 无效 ({proxy}): {e}"));
-        builder = builder.proxy(proxy);
+    if use_proxy {
+        if let Some(proxy) = &CONFIG.proxy_url {
+            let proxy = reqwest::Proxy::all(proxy)
+                .unwrap_or_else(|e| panic!("PROXY_URL 无效 ({proxy}): {e}"));
+            builder = builder.proxy(proxy);
+        }
     }
 
     builder.build().expect("Failed to create HTTP client")
 }
 
-/// 全局 HTTP 客户端
-pub static HTTP_CLIENT: Lazy<Client> = Lazy::new(|| build_client(CONFIG.timeout_seconds));
+/// 全局 HTTP 客户端 (proxy_mode=all 时走网络代理，否则直连)
+pub static HTTP_CLIENT: Lazy<Client> =
+    Lazy::new(|| build_client(CONFIG.timeout_seconds, CONFIG.proxy_mode == "all"));
 
-/// 用于重试的 HTTP 客户端 (更长超时)
-static RETRY_CLIENT: Lazy<Client> = Lazy::new(|| build_client(CONFIG.retry_timeout_seconds));
+/// 用于重试的 HTTP 客户端 (更长超时；配置了 PROXY_URL 时始终走网络代理)
+static RETRY_CLIENT: Lazy<Client> = Lazy::new(|| build_client(CONFIG.retry_timeout_seconds, true));
+
+/// 重试时是否直接用网络代理请求原始 URL (而非拼接 PROXY_PREFIX 反代前缀)
+fn retry_via_network_proxy() -> bool {
+    CONFIG.proxy_url.is_some() && CONFIG.proxy_mode == "retry"
+}
 
 #[derive(Debug, Error)]
 pub enum HttpClientError {
@@ -95,9 +103,14 @@ pub async fn get(url: &str, referer: Option<&str>) -> Result<Response, HttpClien
             };
 
             if should_use_proxy {
-                let proxy_url = format!("{}{}", CONFIG.proxy_prefix, url);
-                tracing::debug!("使用反代重试: {}", url);
-                get_internal(&RETRY_CLIENT, &proxy_url, referer).await
+                if retry_via_network_proxy() {
+                    tracing::debug!("使用网络代理重试: {}", url);
+                    get_internal(&RETRY_CLIENT, url, referer).await
+                } else {
+                    let proxy_url = format!("{}{}", CONFIG.proxy_prefix, url);
+                    tracing::debug!("使用反代重试: {}", url);
+                    get_internal(&RETRY_CLIENT, &proxy_url, referer).await
+                }
             } else {
                 Err(e)
             }
@@ -179,9 +192,14 @@ pub async fn post_form_text(
             };
 
             if should_use_proxy {
-                let proxy_url = format!("{}{}", CONFIG.proxy_prefix, url);
-                tracing::debug!("使用反代重试 POST: {}", url);
-                let resp = post_form_internal(&RETRY_CLIENT, &proxy_url, form, referer).await?;
+                let resp = if retry_via_network_proxy() {
+                    tracing::debug!("使用网络代理重试 POST: {}", url);
+                    post_form_internal(&RETRY_CLIENT, url, form, referer).await?
+                } else {
+                    let proxy_url = format!("{}{}", CONFIG.proxy_prefix, url);
+                    tracing::debug!("使用反代重试 POST: {}", url);
+                    post_form_internal(&RETRY_CLIENT, &proxy_url, form, referer).await?
+                };
                 resp.text()
                     .await
                     .map_err(|e| HttpClientError::RequestFailed(e.to_string()))

@@ -80,7 +80,10 @@ async fn main() {
     // 提前构建 HTTP 客户端：PROXY_URL 配置错误时在启动阶段直接失败
     let _ = &*http_client::HTTP_CLIENT;
     if let Some(proxy) = &CONFIG.proxy_url {
-        info!("🌐 出站请求经由代理: {}", proxy);
+        match CONFIG.proxy_mode.as_str() {
+            "all" => info!("🌐 全部出站请求经由代理: {}", proxy),
+            _ => info!("🌐 失败重试经由网络代理: {}", proxy),
+        }
     }
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();

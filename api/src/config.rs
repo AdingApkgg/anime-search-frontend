@@ -25,8 +25,11 @@ pub struct Config {
     /// 反代前缀 (用于网络问题时重试)
     pub proxy_prefix: String,
 
-    /// 出站网络代理 (http:// / https:// / socks5://，作用于所有外发请求)
+    /// 出站网络代理 (http:// / https:// / socks5://)
     pub proxy_url: Option<String>,
+
+    /// 网络代理模式: "retry"=仅失败重试走代理 (默认，直连优先), "all"=全部请求走代理
+    pub proxy_mode: String,
 
     /// GitHub 代理前缀 (用于 GitHub 资源加速)
     pub github_proxy: String,
@@ -74,6 +77,15 @@ impl Config {
                 .ok()
                 .map(|v| v.trim().to_string())
                 .filter(|v| !v.is_empty()),
+
+            proxy_mode: {
+                let mode = env::var("PROXY_MODE").unwrap_or_else(|_| "retry".to_string());
+                let mode = mode.trim().to_lowercase();
+                if mode != "retry" && mode != "all" {
+                    panic!("PROXY_MODE 无效 ({mode})：仅支持 retry / all");
+                }
+                mode
+            },
 
             github_proxy: env::var("GITHUB_PROXY")
                 .unwrap_or_else(|_| "https://gh-proxy.com/".to_string()),
