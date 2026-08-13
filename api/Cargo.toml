@@ -5,7 +5,7 @@ edition = "2021"
 description = "在线动漫聚合搜索后端 - Rust + Axum"
 license = "MIT"
 authors = ["Asuna"]
-repository = "https://github.com/AdingApkgg/anime-search-api"
+repository = "https://github.com/AdingApkgg/sa"
 
 [dependencies]
 # Web 框架
