@@ -32,7 +32,7 @@ cargo build --release
 cd frontend
 pnpm install
 pnpm dev           # 开发服务器
-pnpm build         # 生产构建（tsc + vite + serwist）→ dist/
+pnpm build         # 生产构建（tsc + vite，含 PWA 生成）→ dist/
 pnpm preview       # 预览生产构建
 ```
 

@@ -16,7 +16,7 @@
 | UI 组件 | Radix UI | - |
 | 音效 | Web Audio API | - |
 | 评论 | Artalk | 2.9 |
-| PWA | Serwist | 9 |
+| PWA | vite-plugin-pwa | 1.3 |
 
 ## 功能特性
 
@@ -60,7 +60,6 @@ src/
 │   ├── StatsCorner.tsx       # 统计角标
 │   ├── SettingsModal.tsx     # 设置面板
 │   ├── CommentsModal.tsx     # 评论面板
-│   ├── UpdateToast.tsx       # SW 更新处理
 │   ├── Background.tsx        # 背景装饰
 │   └── ui/                   # 基础 UI 组件 (shadcn 风格)
 ├── lib/              # 工具库
@@ -70,9 +69,7 @@ src/
 │   ├── search.ts     # 搜索状态
 │   └── ui.ts         # UI 状态
 ├── App.tsx           # 根组件
-├── main.tsx          # 入口文件
-├── serwist.tsx       # Service Worker 注册 (SerwistProvider)
-├── sw.ts             # Service Worker 源码 (Serwist)
+├── main.tsx          # 入口文件 (含 SW 注册)
 ├── index.css         # 全局样式 (Tailwind)
 └── vite-env.d.ts     # Vite 类型声明
 ```
@@ -88,6 +85,6 @@ VITE_API_BASE_URL=https://anime-search.saop.cc
 
 `pnpm build` 依次执行：
 
-1. `tsc -b` - 类型检查（app / sw / node 三个项目引用）
-2. `vite build` - 打包到 `dist/`
-3. `serwist build` - 依据 `serwist.config.js` 注入预缓存清单并生成 `dist/sw.js`
+1. `tsc -b` - 类型检查（app / node 两个项目引用）
+2. `vite build` - 打包到 `dist/`，vite-plugin-pwa（generateSW 模式）自动生成
+   `sw.js` 与 `manifest.webmanifest`（预缓存 + API/字体运行时缓存 + SPA 导航回退）
