@@ -61,6 +61,7 @@ export function Background() {
 
   useEffect(() => {
     isMounted.current = true
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 异步加载，setState 均在 await 之后
     void loadNewImage()
 
     const startTimer = setTimeout(() => {

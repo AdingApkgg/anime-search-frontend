@@ -6,7 +6,7 @@
 
 | 目录 | 说明 | 技术栈 |
 |------|------|--------|
-| [`frontend/`](frontend/) | Web 前端（SPA + PWA） | React 19 + Vite + TypeScript + Tailwind CSS 4 |
+| [`web/`](web/) | Web 前端（SPA + PWA） | React 19 + Vite + TypeScript + Tailwind CSS 4 |
 | [`api/`](api/) | 聚合搜索后端 | Rust + Axum + Tokio |
 
 ## 功能特性
@@ -26,24 +26,24 @@ cargo run          # 开发运行，默认端口 3000
 cargo build --release
 ```
 
-### 前端（frontend/）
+### 前端（web/）
 
 ```bash
-cd frontend
-pnpm install
-pnpm dev           # 开发服务器
-pnpm build         # 生产构建（tsc + vite，含 PWA 生成）→ dist/
-pnpm preview       # 预览生产构建
+cd web
+bun install
+bun run dev        # 开发服务器
+bun run build      # 生产构建（tsc + vite，含 PWA 生成）→ dist/
+bun run preview    # 预览生产构建
 ```
 
 前端默认连接线上 API（`.env` 中的 `VITE_API_BASE_URL`）。本地联调时**不要改动已跟踪的
-`.env`**，在 `frontend/.env.local`（已被 git 忽略）中写入
+`.env`**，在 `web/.env.local`（已被 git 忽略）中写入
 `VITE_API_BASE_URL=http://localhost:3000`，或直接在页面「设置」中自定义 API 地址。
 
 ## 部署
 
-- **前端**：纯静态产物 `frontend/dist/`，可部署到 Cloudflare Pages 等任意静态托管
-  （构建根目录 `frontend`，构建命令 `pnpm build`，输出目录 `dist`）。
+- **前端**：纯静态产物 `web/dist/`，可部署到 Cloudflare Pages 等任意静态托管
+  （构建根目录 `web`，构建命令 `bun run build`，输出目录 `dist`）。
 - **后端**：单二进制，见 [api/README.md](api/README.md)（含 Nginx/SSE 反代配置与预编译产物说明）。
 
 ## License

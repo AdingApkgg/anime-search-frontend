@@ -33,16 +33,16 @@
 
 ```bash
 # 安装依赖
-pnpm install
+bun install
 
 # 启动开发服务器
-pnpm dev
+bun run dev
 
 # 构建生产版本
-pnpm build
+bun run build
 
 # 预览生产版本
-pnpm preview
+bun run preview
 ```
 
 ## 项目结构
@@ -83,7 +83,7 @@ VITE_API_BASE_URL=https://anime-search.saop.cc
 
 ## 构建说明
 
-`pnpm build` 依次执行：
+`bun run build` 依次执行：
 
 1. `tsc -b` - 类型检查（app / node 两个项目引用）
 2. `vite build` - 打包到 `dist/`，vite-plugin-pwa（generateSW 模式）自动生成

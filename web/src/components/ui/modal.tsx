@@ -67,13 +67,10 @@ const fullscreenMobileVariants = {
 }
 
 export function Modal({ open, onClose, children, className, fullscreenOnMobile = false }: ModalProps) {
-  const [mounted, setMounted] = React.useState(false)
-  const [isMobile, setIsMobile] = React.useState(false)
+  const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 640)
 
   React.useEffect(() => {
-    setMounted(true)
     const checkMobile = () => setIsMobile(window.innerWidth < 640)
-    checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
@@ -98,8 +95,6 @@ export function Modal({ open, onClose, children, className, fullscreenOnMobile =
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
   }, [open, onClose])
-
-  if (!mounted) return null
 
   return createPortal(
     <AnimatePresence>
